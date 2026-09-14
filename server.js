@@ -122,7 +122,7 @@ app.use(cookieSession({
   httpOnly: true,
   sameSite: "lax",
   secure: process.env.NODE_ENV === "production",
-  maxAge: 1000 * 60 * 60 * 24 * 7
+  maxAge: 1000 * 60 * 60 * 24 * 30
 }));
 
 // Stripe webhook must receive the raw body BEFORE express.json().
@@ -381,6 +381,11 @@ app.post("/api/login", async (req,res) => {
   const user=db.prepare('SELECT * FROM users WHERE email=?').get(email);
   if(!user || !(await bcrypt.compare(password,user.password_hash))){db.prepare('INSERT INTO login_attempts(ip,email,success) VALUES(?,?,0)').run(ip,email);if(user)logSecurity(user.id,'login_failed','Tentative de connexion échouée');return res.status(401).json({error:'Courriel ou mot de passe incorrect.'});}
   db.prepare('INSERT INTO login_attempts(ip,email,success) VALUES(?,?,1)').run(ip,email);
+  if(!mailTransport || !siteEmail){
+    createSession(req,user.id);
+    logSecurity(user.id,'login_success','Connexion directe (service courriel non configuré)');
+    return res.json({ok:true,requiresCode:false,message:'Connexion réussie.'});
+  }
   try{const id=await createVerification(user.id,'login');req.session.pendingLoginUserId=user.id;req.session.pendingLoginVerificationId=Number(id);logSecurity(user.id,'login_code_sent','Code de connexion envoyé par courriel');res.json({ok:true,requiresCode:true,message:'Un code de sécurité a été envoyé à ton adresse courriel.'});}
   catch(e){res.status(503).json({error:e.message||'Impossible d’envoyer le code de sécurité.'});}
 });
