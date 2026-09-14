@@ -233,7 +233,7 @@ function currentUser(req) {
 // Accès membre : toutes les fonctions du site/API restent verrouillées tant que la personne n'est pas connectée.
 // Exceptions : inscription, connexion, déconnexion, état de session, abonnement FREE initial et webhook Stripe.
 app.use('/api', (req,res,next) => {
-  const open = new Set(['/api/me','/api/register','/api/access','/api/login','/api/login/verify','/api/login/resend-code','/api/logout','/api/free-subscribe','/api/stripe/webhook','/api/announcements']);
+  const open = new Set(['/me','/register','/access','/login','/login/verify','/login/resend-code','/logout','/free-subscribe','/stripe/webhook','/announcements']);
   if (open.has(req.path)) return next();
   const user = currentUser(req);
   if (!user) return res.status(401).json({error:'Accès verrouillé. Connecte-toi ou crée un compte pour continuer.'});
