@@ -653,4 +653,4 @@ app.get("/api/vip-content", (req,res) => {
   });
 });
 
-app.listen(port, () => console.log(`Evan VIP: http://localhost:${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`Evan VIP: http://0.0.0.0:${port}`));
