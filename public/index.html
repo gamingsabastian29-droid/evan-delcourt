@@ -61,7 +61,7 @@
   <header class="wrap">
     <nav class="nav" aria-label="Navigation principale">
       <div class="brand">EVAN<span>_DELCOURT</span></div>
-      <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#notifications">🔔 Nouveautés</a><a href="#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
+      <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#musiques">🔔 Nouveautés</a><a href="abonnement.html">👑 Abonnement</a><a href="#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
     </nav>
   </header>
 
@@ -86,8 +86,6 @@
   <div class="comment-modal" id="commentModal" aria-hidden="true"><div class="login-box"><button class="login-close" id="closeComment">×</button><div class="kicker">💬 COMMENTAIRES</div><h3 id="commentTitle">Commentaires</h3><div id="commentList" class="comment-list"></div><form id="commentForm" class="subscribe-form"><textarea id="commentBody" maxlength="500" placeholder="Écris ton commentaire…" required></textarea><button class="pill" type="submit">Publier</button></form><div class="notice" id="commentNotice"></div></div></div>
 
   <main>
-      <section class="wrap" id="notifications" style="padding-top:18px"><div class="panel reveal"><div class="kicker">🔔 Notifications</div><h2>Nouveautés</h2><p style="color:var(--muted);margin:6px 0 0">Retrouve ici les nouvelles chansons, Shorts et annonces de la chaîne.</p></div></section>
-    <section class="wrap feature-grid" style="padding-top:18px"><div class="panel reveal" id="recherche"><div class="kicker">🔎 Recherche</div><h2>Trouver un contenu</h2><form id="searchForm" class="subscribe-form"><input id="searchInput" placeholder="Chanson, Short ou annonce…" aria-label="Rechercher"><button class="pill" type="submit">Rechercher</button></form><div id="searchResults" class="search-results"></div></div><div class="panel reveal" id="nouveautes"><div class="kicker">📅 Nouveautés</div><h2>Dernières sorties</h2><div id="newItems" class="new-items"><div class="ranking-empty">Chargement…</div></div></div></section>
     <section class="hero wrap">
       <div class="reveal">
         <div class="eyebrow"><span class="dot"></span>Artiste indépendant · Canada</div>
@@ -102,6 +100,7 @@
       <div class="wrap">
         <div class="section-head reveal"><div><div class="kicker">Rangée sons normaux</div><h2>Les chansons<br>complètes</h2></div><p>Les morceaux complets d’Evan sont présentés sur leur propre rangée.</p></div>
         <div class="releases">
+          <article class="card reveal new-release"><div class="cover"><img src="assets/minuit-minuit-officiel.png" alt="Pochette de Minuit, minuit officiel"></div><div class="meta"><div class="number">NOUVEAU · SORTIE 01</div><h3>MINUIT, MINUIT OFFICIEL</h3><p>Afro Soul Rap · nouveau son</p><audio class="song-audio" controls preload="metadata" src="assets/minuit-minuit-officiel.mp3"></audio><div class="content-actions"><button class="pill play-btn" type="button" data-local-audio="minuit">▶️ Écouter</button><button class="ghost like-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">💬 Commenter</button><button class="ghost fav-btn" data-title="MINUIT, MINUIT OFFICIEL">❤️ Favori</button></div></div></article>
           <article class="card reveal"><div class="cover"><img src="assets/jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button><button class="ghost fav-btn" data-title="J’SUIS QU’UN HOMME">❤️ Favori</button></div></div></article>
           <article class="card reveal"><div class="cover"><img src="assets/ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button><button class="ghost fav-btn" data-title="MA FINALE">❤️ Favori</button></div></div></article>
           <article class="card reveal"><div class="cover"><img src="assets/repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button><button class="ghost fav-btn" data-title="REPOSE EN PAIX">❤️ Favori</button></div></div></article>
@@ -140,66 +139,19 @@
       </div>
     </section>
 
-    <section id="abonnement">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <div><div class="kicker">Communauté Evan</div><h2>S’abonner<br>à Evan</h2><p style="margin:8px 0 0;color:var(--muted)">Passe au forfait Premium pour débloquer les avantages VIP.</p></div><a class="pill" href="#premium">👑 Passer au forfait</a>
-          <p>Choisis ton mode : **gratuit à 0 $** ou **VIP à 4,99 $/mois**. Tu peux commencer gratuitement et passer VIP plus tard.</p>
-        </div>
-
-        <div class="subscribe-grid">
-          <article class="subscribe-card reveal">
-            <div class="kicker">GRATUIT</div>
-            <h3>🔔 Fan d’Evan</h3>
-            <div class="price">0 $ <small>pour toujours</small></div>
-            <ul class="benefits">
-              <li>Nouvelles sorties par courriel</li>
-              <li>Annonces et nouveaux Shorts</li>
-              <li>Aucun paiement</li>
-            </ul>
-            <form class="subscribe-form" id="freeSubscribeForm">
-              <input id="fanName" type="text" placeholder="Ton pseudo" maxlength="40" required>
-              <input id="fanEmail" type="email" placeholder="Ton adresse courriel" autocomplete="email" required>
-              <input id="fanPassword" type="password" placeholder="Mot de passe (8 caractères minimum)" minlength="8" autocomplete="new-password" required>
-              <button class="pill" type="submit">S’abonner gratuitement</button>
-            </form>
-            <div class="notice" id="freeNotice">Crée ton compte gratuit avec ton nom, ton courriel et ton mot de passe. Aucun paiement ne sera demandé.</div>
-          </article>
-
-          <article class="subscribe-card vip reveal">
-            <div class="kicker">VIP</div>
-            <h3>⭐ Evan VIP</h3>
-            <div class="price">4,99 $ <small>/ mois</small></div>
-            <ul class="benefits">
-              <li>Accès aux contenus exclusifs</li>
-              <li>Avant-premières des nouvelles chansons</li>
-              <li>Actualités réservées aux membres</li>
-              <li>Résiliable quand tu veux</li>
-            </ul>
-            <button class="pill" type="button" id="vipButton">Devenir membre VIP</button>
-            <div class="notice" id="vipNotice">Tu vas être envoyé vers l’espace membre pour créer ton compte puis payer avec Stripe.</div>
-          </article>
-        </div>
-
-        <section class="premium-ranking reveal" id="classement-premium">
-          <div class="kicker">ABONNÉS</div>
-          <h3>👥 Membres de la communauté</h3>
-          <p class="ranking-sub">Tu peux voir combien de personnes sont abonnées gratuitement ou VIP. Chaque abonné apparaît avec son pseudo et son badge 🔔 FREE ou ⭐ VIP.</p>
-          <div class="ranking-list" id="subscriberSummary"><div class="ranking-empty">Chargement des abonnés…</div></div>
-          <div id="classement-free" style="scroll-margin-top:100px;margin-top:20px"><h4 style="margin:0 0 8px">🔔 Classement FREE</h4><div class="ranking-list" id="freeRanking"><div class="ranking-empty">Chargement…</div></div></div>
-          <div id="classement-vip" style="scroll-margin-top:100px;margin-top:20px"><h4 style="margin:0 0 8px">🏆 Classement VIP</h4><div class="ranking-list" id="premiumRanking"><div class="ranking-empty">Chargement…</div></div></div>
-        </section>
-      </div>
-    </section>
-
     <div class="wrap cta reveal"><div><h2>Écouter Evan sur YouTube</h2><p>Retrouve les nouvelles sorties sur la chaîne officielle.</p></div><a class="pill" href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">Ouvrir la chaîne ↗</a></div>
+  
+    <section class="wrap" id="notifications" style="padding-top:28px"><div class="panel reveal"><div class="kicker">🔔 Notifications</div><h2>Nouveautés</h2><p style="color:var(--muted);margin:6px 0 0">Retrouve ici les nouvelles chansons, Shorts et annonces de la chaîne.</p></div></section>
+    <section class="wrap feature-grid" style="padding-top:18px"><div class="panel reveal" id="recherche"><div class="kicker">🔎 Recherche</div><h2>Trouver un contenu</h2><form id="searchForm" class="subscribe-form"><input id="searchInput" placeholder="Chanson, Short ou annonce…" aria-label="Rechercher"><button class="pill" type="submit">Rechercher</button></form><div id="searchResults" class="search-results"></div></div></section>
+    <section class="wrap" style="padding-top:18px"><div class="panel reveal" id="nouveautes"><div class="kicker">📅 Nouveautés</div><h2>Dernières sorties</h2><div id="newItems" class="new-items"><div class="ranking-empty">Chargement…</div></div></div></section>
   </main>
   <footer><div class="wrap foot"><span>© 2026 Evan_Delcourt</span><span>Afro Soul Rap · Canada</span></div></footer>
     <div id="miniPlayer" class="mini-player" aria-live="polite">
     <div style="font-size:1.5rem">🎵</div>
-    <div class="player-title"><strong id="playerTitle">Aucune chanson sélectionnée</strong><small>Evan Delcourt</small></div>
-    <div class="player-note">Lecture via la chaîne YouTube</div>
-    <button class="pill" type="button" id="playerYoutube">▶️ Ouvrir YouTube</button>
+    <div class="player-title"><strong id="playerTitle">Aucune chanson sélectionnée</strong><small id="playerQueueLabel">Evan Delcourt · File d’écoute</small></div>
+    <button class="ghost small" type="button" id="playerPrev" aria-label="Précédent">⏮️</button>
+    <button class="pill" type="button" id="playerYoutube">▶️ Écouter sur YouTube</button>
+    <button class="ghost small" type="button" id="playerNext" aria-label="Suivant">⏭️</button>
     <button class="ghost" type="button" id="closePlayer" aria-label="Fermer">✕</button>
   </div>
 
@@ -326,6 +278,7 @@
     document.getElementById('newItems').innerHTML=['J’SUIS QU’UN HOMME','MA FINALE','REPOSE EN PAIX','MODERN WARFARE 4','FREDDYS CLIP OFFICIEL','PAS CALME'].map((x,i)=>`<div class="new-item"><span>#${i+1}</span><b>${escapeHtml(x)}</b><small>${i<3?'Chanson complète':'Short'}</small></div>`).join('');
     async function likeContent(btn){try{const r=await fetch(API_BASE+'/api/likes/toggle',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({contentType:btn.dataset.type,contentTitle:btn.dataset.title})});const d=await r.json();if(!r.ok) throw new Error(d.error);btn.textContent=`${d.liked?'❤️':'👍'} J’aime (${d.count})`;}catch(e){alert(e.message||'Connecte-toi pour aimer ce contenu.');}}
     document.querySelectorAll('.like-btn').forEach(b=>b.addEventListener('click',()=>likeContent(b)));
+    (async function loadLikeCounts(){try{const buttons=[...document.querySelectorAll('.like-btn')];const params=buttons.map(b=>encodeURIComponent(`${b.dataset.type}|${b.dataset.title}`)).join('&items=');if(!params)return;const r=await fetch(API_BASE+'/api/likes/counts?items='+params);const d=await r.json();buttons.forEach(b=>{const k=`${b.dataset.type}|${b.dataset.title}`,n=Number(d.counts?.[k]||0);b.textContent=`${n?'❤️':'👍'} J’aime (${n})`;});}catch{}})();
     const cm=document.getElementById('commentModal'), cl=document.getElementById('commentList'), cf=document.getElementById('commentForm'), cn=document.getElementById('commentNotice'); let commentTarget={};
     async function openComments(type,title){commentTarget={type,title};cm.classList.add('show');cm.setAttribute('aria-hidden','false');document.getElementById('commentTitle').textContent='💬 '+title;try{const r=await fetch(API_BASE+'/api/comments?contentType='+encodeURIComponent(type)+'&contentTitle='+encodeURIComponent(title));const d=await r.json();cl.innerHTML=d.comments?.length?d.comments.map(x=>`<div class="comment"><b>${escapeHtml(x.author)} <span class="badge ${x.status==='VIP'?'vip':'free'}">${x.status==='VIP'?'⭐ VIP':'🔔 FREE'}</span></b><p>${escapeHtml(x.body)}</p><div class="comment-tools"><button class="ghost small" onclick="replyComment(${x.id})">↩️ Répondre</button><button class="ghost small" onclick="reportComment(${x.id})">🚨 Signaler</button></div>${(x.replies||[]).map(y=>`<div class="reply"><b>↳ ${escapeHtml(y.author)} <span class="badge ${y.status==='VIP'?'vip':'free'}">${y.status==='VIP'?'⭐ VIP':'🔔 FREE'}</span></b><p>${escapeHtml(y.body)}</p></div>`).join('')}</div>`).join(''):'<div class="ranking-empty">Aucun commentaire pour le moment.</div>';}catch{cl.innerHTML='<div class="ranking-empty">Commentaires indisponibles.</div>';}}
     async function replyComment(id){const body=prompt('Ta réponse au commentaire :');if(!body?.trim())return;try{await fetch(API_BASE+'/api/comments/reply',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({commentId:id,body:body.trim()})}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error)});await openComments(commentTarget.type,commentTarget.title);}catch(e){alert(e.message)}}
@@ -339,14 +292,20 @@
 
   
     const youtubeChannel='https://www.youtube.com/@Evan_Delcourt-y7y';
-    const miniPlayer=document.getElementById('miniPlayer'), playerTitle=document.getElementById('playerTitle');
-    let selectedTrack='';
-    function selectTrack(title){selectedTrack=title;playerTitle.textContent=title;miniPlayer.classList.add('show');localStorage.setItem('evan_last_track',title);try{fetch(API_BASE+'/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({title,action:'Sélectionné'})})}catch{}}
+    const miniPlayer=document.getElementById('miniPlayer'), playerTitle=document.getElementById('playerTitle'), playerQueueLabel=document.getElementById('playerQueueLabel');
+    const playerQueue=Array.from(document.querySelectorAll('#musiques h3')).map(h=>h.textContent.trim());
+    let selectedTrack=''; let selectedIndex=-1;
+    function selectTrack(title){selectedTrack=title;selectedIndex=Math.max(0,playerQueue.indexOf(title));playerTitle.textContent=title;if(playerQueueLabel)playerQueueLabel.textContent=`Evan Delcourt · ${selectedIndex+1}/${playerQueue.length} dans la file`;miniPlayer.classList.add('show');localStorage.setItem('evan_last_track',title);try{fetch(API_BASE+'/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({title,action:'Sélectionné'})})}catch{}}
+    function stepTrack(delta){if(!playerQueue.length)return;selectedIndex=(selectedIndex+delta+playerQueue.length)%playerQueue.length;selectTrack(playerQueue[selectedIndex]);}
     document.querySelectorAll('.fav-btn').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();try{const r=await fetch(API_BASE+'/api/favorites/toggle',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({title:btn.dataset.title})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Connecte-toi pour ajouter un favori.');btn.classList.toggle('active',d.favorite);btn.textContent=d.favorite?'❤️ Favori':'❤️ Favori';}catch(err){alert(err.message)}}));
     document.querySelectorAll('#musiques h3').forEach(h=>{const card=h.closest('article');if(!card)return;const title=h.textContent.trim();const actions=card.querySelector('.content-actions');if(actions&&!actions.querySelector('.play-btn')){const b=document.createElement('button');b.className='pill play-btn';b.type='button';b.textContent='▶️ Écouter';b.addEventListener('click',()=>selectTrack(title));actions.prepend(b)}});
+
+    document.querySelectorAll('[data-local-audio="minuit"]').forEach(btn=>{const audio=btn.closest('.card')?.querySelector('.song-audio');if(audio){btn.addEventListener('click',()=>{if(audio.paused){audio.play();btn.textContent='⏸️ Pause';}else{audio.pause();btn.textContent='▶️ Écouter';}});audio.addEventListener('ended',()=>btn.textContent='▶️ Écouter');}});
     document.getElementById('playerYoutube')?.addEventListener('click',()=>window.open(youtubeChannel,'_blank','noopener'));
+    document.getElementById('playerPrev')?.addEventListener('click',()=>stepTrack(-1));
+    document.getElementById('playerNext')?.addEventListener('click',()=>stepTrack(1));
     document.getElementById('closePlayer')?.addEventListener('click',()=>miniPlayer.classList.remove('show'));
-    const savedTrack=localStorage.getItem('evan_last_track');if(savedTrack){selectedTrack=savedTrack;playerTitle.textContent=savedTrack;}
+    const savedTrack=localStorage.getItem('evan_last_track');if(savedTrack){selectedTrack=savedTrack;selectedIndex=playerQueue.indexOf(savedTrack);playerTitle.textContent=savedTrack;if(playerQueueLabel)playerQueueLabel.textContent=`Evan Delcourt · ${Math.max(1,selectedIndex+1)}/${playerQueue.length} dans la file`;}
 
     async function loadAccountSummary(){
       try{

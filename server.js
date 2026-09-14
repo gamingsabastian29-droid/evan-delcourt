@@ -6,6 +6,8 @@ import cookieSession from "cookie-session";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
@@ -18,7 +20,10 @@ const app = express();
 app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-const db = new Database("members.db");
+const dbPath = process.env.DB_PATH || path.join(process.cwd(), "data", "members.db");
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+const db = new Database(dbPath);
+db.pragma("journal_mode = WAL");
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS free_subscribers (
@@ -78,6 +83,7 @@ CREATE TABLE IF NOT EXISTS user_sessions (id TEXT PRIMARY KEY, user_id INTEGER N
 CREATE TABLE IF NOT EXISTS friendships (id INTEGER PRIMARY KEY AUTOINCREMENT, requester_id INTEGER NOT NULL, addressee_id INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(requester_id,addressee_id), FOREIGN KEY(requester_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(addressee_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS private_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id INTEGER NOT NULL, recipient_id INTEGER NOT NULL, body TEXT NOT NULL, read_at TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(sender_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(recipient_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS oauth_accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, provider TEXT NOT NULL, provider_user_id TEXT, provider_name TEXT, access_token TEXT, refresh_token TEXT, expires_at INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS donations (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, amount_cents INTEGER NOT NULL, currency TEXT NOT NULL DEFAULT 'cad', stripe_session_id TEXT UNIQUE, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT DEFAULT CURRENT_TIMESTAMP, paid_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL);
 CREATE TABLE IF NOT EXISTS email_verifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, purpose TEXT NOT NULL, code_hash TEXT NOT NULL, new_password_hash TEXT, expires_at TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, used_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 `);
 
@@ -170,6 +176,11 @@ app.post("/api/stripe/webhook", express.raw({type: "application/json"}), (req, r
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
+    if (session.mode === "payment" && session.metadata?.type === "donation") {
+      db.prepare("UPDATE donations SET status='paid', paid_at=CURRENT_TIMESTAMP WHERE stripe_session_id=?").run(session.id);
+      const donorUserId = Number(session.metadata?.user_id || 0);
+      if (donorUserId) logSecurity(donorUserId, 'donation_paid', `Soutien de ${((session.amount_total || 0)/100).toFixed(2)} ${(session.currency || 'cad').toUpperCase()}`);
+    }
     if (session.mode === "subscription" && session.customer) {
       updateByCustomer(session.customer, "active", session.subscription, false);
     }
@@ -471,6 +482,31 @@ app.post("/api/create-checkout-session", async (req,res) => {
   }
 });
 
+app.post("/api/create-donation-session", async (req,res) => {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({error:"Connecte-toi d'abord."});
+  if (!stripe) return res.status(503).json({error:"Stripe n’est pas configuré sur le serveur."});
+  const amount = Number(req.body.amount);
+  if (!Number.isFinite(amount) || amount < 1 || amount > 10000) return res.status(400).json({error:"Choisis un montant entre 1 $ et 10 000 $."});
+  const cents = Math.round(amount * 100);
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment", customer_email: user.email,
+      line_items: [{price_data:{currency:"cad",product_data:{name:"Soutien à Evan_Delcourt"},unit_amount:cents},quantity:1}],
+      metadata:{type:"donation",user_id:String(user.id),member_id:String(user.member_id||"")},
+      success_url:`${process.env.BASE_URL}/vip.html?donation=success`, cancel_url:`${process.env.BASE_URL}/vip.html?donation=canceled`, submit_type:"donate"
+    });
+    db.prepare("INSERT INTO donations(user_id,amount_cents,currency,stripe_session_id) VALUES(?,?,?,?)").run(user.id,cents,"cad",session.id);
+    logSecurity(user.id,'donation_started',`Soutien de ${amount.toFixed(2)} CAD`);
+    res.json({url:session.url});
+  } catch(e) { res.status(500).json({error:e.message}); }
+});
+app.get("/api/my-donations", (req,res) => {
+  const user=currentUser(req); if(!user) return res.status(401).json({error:"Connecte-toi d'abord."});
+  const rows=db.prepare("SELECT amount_cents,currency,status,created_at,paid_at FROM donations WHERE user_id=? ORDER BY id DESC LIMIT 50").all(user.id);
+  res.json({donations:rows.map(x=>({...x,amount:(x.amount_cents/100).toFixed(2)}))});
+});
+
 app.post("/api/create-portal-session", async (req,res) => {
   const user = currentUser(req);
   if (!user) return res.status(401).json({error:"Connecte-toi d'abord."});
@@ -728,6 +764,36 @@ app.post("/api/settings", (req,res) => {
   const theme=['system','light','dark'].includes(req.body.theme)?req.body.theme:'system'; const notifications=req.body.notifications===false?0:1; const compact=req.body.compactMode===true?1:0;
   db.prepare("INSERT INTO user_settings(user_id,theme,notifications,compact_mode) VALUES(?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET theme=excluded.theme,notifications=excluded.notifications,compact_mode=excluded.compact_mode").run(user.id,theme,notifications,compact); res.json({ok:true,settings:{theme,notifications,compact_mode:compact}});
 });
+function notify(userId,type,title,message){
+  try{
+    const pref=db.prepare('SELECT notifications FROM user_settings WHERE user_id=?').get(userId);
+    if(pref && Number(pref.notifications)===0) return;
+    db.prepare('INSERT INTO notifications(user_id,type,title,message) VALUES(?,?,?,?)').run(userId,String(type||'info').slice(0,40),String(title||'Notification').slice(0,120),String(message||'').slice(0,500));
+    db.prepare("DELETE FROM notifications WHERE user_id=? AND id NOT IN (SELECT id FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 100)").run(userId,userId);
+  }catch(e){ console.warn('Notification error:',e.message); }
+}
+app.get('/api/notifications',(req,res)=>{
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const rows=db.prepare('SELECT id,type,title,message,read_at,created_at FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 50').all(u.id);
+  const unread=db.prepare('SELECT COUNT(*) c FROM notifications WHERE user_id=? AND read_at IS NULL').get(u.id).c;
+  res.json({notifications:rows,unread});
+});
+app.post('/api/notifications/read',(req,res)=>{
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const id=Number(req.body?.id||0);
+  if(id) db.prepare('UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?').run(id,u.id);
+  else db.prepare('UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE user_id=? AND read_at IS NULL').run(u.id);
+  res.json({ok:true});
+});
+app.get('/api/likes/counts',(req,res)=>{
+  const items=Array.isArray(req.query.items)?req.query.items:[req.query.items].filter(Boolean);
+  const out={};
+  for(const raw of items){
+    try{const [type,title]=String(raw).split('|'); if(!type||!title) continue; out[raw]=db.prepare('SELECT COUNT(*) c FROM likes WHERE content_type=? AND content_title=?').get(type,title).c;}catch{}
+  }
+  res.json({counts:out});
+});
+
 function moderateText(value){
   const text=String(value||'').toLowerCase();
   const rules=[

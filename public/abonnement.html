@@ -1,0 +1,26 @@
+
+<body>
+  <header class="wrap"><nav class="nav" aria-label="Navigation principale"><div class="brand">EVAN<span>_DELCOURT</span></div><div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="index.html#musiques">🎵 Musiques</a><a href="index.html#shorts">🎬 Shorts</a><a href="index.html#notifications">🔔 Nouveautés</a><a class="pill" href="abonnement.html">👑 Abonnement</a><a href="index.html#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><a class="pill" href="vip.html">👤 Mon compte</a></div></nav></header>
+  <main>
+    <section class="wrap" style="padding-top:22px"><a class="ghost back-home" href="index.html">← Retour à l’accueil</a><div class="section-head reveal"><div><div class="kicker">Communauté Evan</div><h1>S’abonner à Evan</h1><p style="margin:8px 0 0;color:var(--muted)">Choisis ton abonnement. Le compte gratuit reste gratuit, et le VIP ajoute des avantages exclusifs.</p></div></div>
+      <div class="subscribe-grid">
+        <article class="subscribe-card reveal"><div class="kicker">GRATUIT</div><h3>🔔 Fan d’Evan</h3><div class="price">0 $ <small>pour toujours</small></div><ul class="benefits"><li>Nouvelles sorties par courriel</li><li>Annonces et nouveaux Shorts</li><li>Aucun paiement</li><li>Profil et AccountID</li><li>Accès à la communauté</li></ul><form class="subscribe-form" id="freeSubscribeForm"><input id="fanName" type="text" placeholder="Ton pseudo" maxlength="40" required><input id="fanEmail" type="email" placeholder="Ton adresse courriel" autocomplete="email" required><input id="fanPassword" type="password" placeholder="Mot de passe (8 caractères minimum)" minlength="8" autocomplete="new-password" required><button class="pill" type="submit">S’abonner gratuitement</button></form><div class="notice" id="freeNotice">Crée ton compte gratuit. Aucun paiement ne sera demandé.</div></article>
+        <article class="subscribe-card vip reveal"><div class="kicker">VIP</div><h3>⭐ Evan VIP</h3><div class="price">4,99 $ <small>/ mois</small></div><ul class="benefits"><li>Accès aux contenus exclusifs</li><li>Avant-premières des nouvelles chansons</li><li>Actualités réservées aux membres</li><li>Récompenses et avantages VIP</li><li>Résiliable quand tu veux</li></ul><button class="pill" type="button" id="vipButton">Devenir membre VIP</button><div class="notice" id="vipNotice">Paiement sécurisé avec Stripe.</div></article>
+      </div>
+      <div class="plan-extra">
+        <div class="panel reveal"><div class="kicker">💎 AVANTAGES</div><h3>Points & récompenses</h3><p class="muted">Gagne de l’XP, monte de niveau et utilise tes points dans la boutique.</p></div>
+        <div class="panel reveal"><div class="kicker">👤 PROFIL</div><h3>Carte de membre</h3><p class="muted">Ton nom, ton AccountID, ton niveau, tes badges et ton statut.</p></div>
+        <div class="panel reveal"><div class="kicker">🔒 SÉCURITÉ</div><h3>Compte protégé</h3><p class="muted">Sessions et informations personnelles restent protégées.</p></div>
+      </div>
+      <div class="panel reveal faq"><div class="kicker">❓ QUESTIONS</div><details><summary>Le compte gratuit coûte-t-il quelque chose ?</summary><p class="muted">Non. Le compte gratuit reste à 0 $.</p></details><details><summary>Comment fonctionne le VIP ?</summary><p class="muted">Le VIP est à 4,99 $ par mois et passe par Stripe lorsque la configuration de paiement est active.</p></details><details><summary>Puis-je arrêter le VIP ?</summary><p class="muted">Oui, l’abonnement peut être résilié selon les conditions de ton abonnement Stripe.</p></details></div>
+    </section>
+  </main>
+  <footer><div class="wrap foot"><span>© 2026 Evan_Delcourt</span><span>Afro Soul Rap · Canada</span></div></footer>
+<script>
+const API_BASE=window.EVAN_API_URL||'';
+const $=id=>document.getElementById(id);
+$('freeSubscribeForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('fanEmail').value.trim(),displayName=$('fanName').value.trim(),password=$('fanPassword').value;if(password.length<8)return;try{const r=await fetch(API_BASE+'/api/free-subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,displayName,password})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Impossible de créer le compte.');$('freeNotice').textContent=d.message||'Compte créé avec succès.';if(d.redirect){setTimeout(()=>location.href=d.redirect,700)}}catch(err){$('freeNotice').textContent=err.message||'Erreur.'}});
+$('vipButton')?.addEventListener('click',()=>location.href='/vip.html');
+</script>
+</body>
+</html>
