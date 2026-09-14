@@ -1,0 +1,19 @@
+{
+  "name": "evan-delcourt-vip",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "bcryptjs": "^3.0.2",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "stripe": "^18.5.0",
+    "nodemailer": "^7.0.6"
+  }
+}
