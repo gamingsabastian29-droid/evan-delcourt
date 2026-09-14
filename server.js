@@ -276,7 +276,7 @@ app.post("/api/register", async (req,res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     const result = db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)").run(email, displayName, hash, "inactive");
-    req.session.userId = result.lastInsertRowid; req.session.sessionVersion = 1;
+    req.session.userId = result.lastInsertRowid; createSession(req, result.lastInsertRowid);
     db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email, displayName);
     res.json({ok:true});
   } catch {
@@ -653,4 +653,4 @@ app.get("/api/vip-content", (req,res) => {
   });
 });
 
-app.listen(port, '0.0.0.0', () => console.log(`Evan VIP: http://0.0.0.0:${port}`));
+app.listen(port, () => console.log(`Evan VIP: http://localhost:${port}`));
