@@ -14,6 +14,8 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 }
 
 const app = express();
+// Render terminates HTTPS at its proxy. Trust the proxy so secure session cookies are set correctly.
+app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const db = new Database("members.db");
@@ -276,7 +278,7 @@ app.post("/api/register", async (req,res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     const result = db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)").run(email, displayName, hash, "inactive");
-    req.session.userId = Number(result.lastInsertRowid); createSession(req, Number(result.lastInsertRowid));
+    req.session.userId = result.lastInsertRowid; req.session.sessionVersion = 1;
     db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email, displayName);
     res.json({ok:true});
   } catch {
@@ -653,4 +655,4 @@ app.get("/api/vip-content", (req,res) => {
   });
 });
 
-app.listen(port, () => console.log(`Evan VIP: http://localhost:${port}`));
+app.listen(port, "0.0.0.0", () => console.log(`Evan VIP: http://0.0.0.0:${port}`));
