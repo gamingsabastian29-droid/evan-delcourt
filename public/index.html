@@ -46,6 +46,8 @@
     .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.search-results,.new-items{display:grid;gap:9px;margin-top:16px}.search-item,.new-item,.comment{padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:rgba(0,0,0,.14)}.search-item span,.new-item small{display:block;color:var(--muted);margin-top:4px}.new-item{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px}.content-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.content-actions .ghost{padding:8px 11px}.comment-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:1100}.comment-modal.show{display:flex}.comment-list{max-height:300px;overflow:auto;display:grid;gap:9px;margin:14px 0}.comment p{margin:7px 0 0;color:var(--muted)}.comment-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.reply{margin:10px 0 0 18px;padding:10px 12px;border-left:2px solid var(--line);background:rgba(255,255,255,.025);border-radius:10px}.small{font-size:.82rem;padding:7px 10px}textarea{width:100%;min-height:90px;box-sizing:border-box;padding:13px 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:inherit;resize:vertical}.badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.72rem}.badge.vip{background:rgba(255,93,177,.15);color:#ff9bcf}.badge.free{background:rgba(127,240,192,.12);color:#7ff0c0}
     :root.light{--bg:#f5f6fb;--panel:#fff;--ink:#17182a;--muted:#646981;--line:#dfe2ee}.light body{background:var(--bg)}
     @media(max-width:700px){.feature-grid{grid-template-columns:1fr}.new-item{grid-template-columns:32px 1fr}.new-item small{grid-column:2}}
+
+    .library-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.library-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.015));box-shadow:0 12px 30px rgba(0,0,0,.16)}.library-card h3{margin:0 0 7px}.library-card p{color:var(--muted);margin:0 0 13px}.fav-btn.active{border-color:#ff63b8;color:#ff9bd2;background:rgba(255,92,184,.12)}.mini-player{position:fixed;left:16px;right:16px;bottom:16px;z-index:1200;display:none;align-items:center;gap:14px;padding:12px 15px;border:1px solid rgba(184,126,255,.5);border-radius:18px;background:rgba(8,10,25,.94);backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.35)}.mini-player.show{display:flex}.mini-player .player-title{flex:1;min-width:0}.mini-player .player-title strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini-player .player-title small{color:var(--muted)}.mini-player .player-note{color:var(--muted);font-size:.82rem}.mini-player button{white-space:nowrap}.playlist-box{display:grid;gap:8px}.playlist-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}.playlist-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:800px){.library-grid{grid-template-columns:1fr}.mini-player{left:8px;right:8px;bottom:8px;flex-wrap:wrap}.mini-player .player-note{width:100%}}
 </style>
 <style id="mobile-settings-css">
 @media(max-width:700px){body{overflow-x:hidden}.wrap{width:min(100% - 24px,1100px)}.nav{padding:10px 0}.navlinks{gap:6px}.navlinks a,.navlinks button{font-size:.82rem}.hero{grid-template-columns:1fr!important}.card{padding:18px!important}.feature-grid,.grid3{grid-template-columns:1fr!important}.subscribe-grid{grid-template-columns:1fr!important}.content-actions button{flex:1 1 100%}.comment-modal{padding:10px}.login-box{padding:20px;max-height:90vh;overflow:auto}.ranking-list,.comment-list{max-height:55vh}.subscribe-form input{min-width:0;width:100%}h1{font-size:clamp(2rem,10vw,4.5rem)} }
@@ -57,7 +59,7 @@
   <header class="wrap">
     <nav class="nav" aria-label="Navigation principale">
       <div class="brand">EVAN<span>_DELCOURT</span></div>
-      <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#notifications">🔔 Notifications</a><a href="#classement-vip">🏆 Classement VIP</a><a href="#classement-free">🔔 Classement FREE</a><a href="#abonnement">⭐ Abonnement</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
+      <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#notifications">🔔 Nouveautés</a><a href="#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
     </nav>
   </header>
 
@@ -89,16 +91,16 @@
         <p class="lead">Une voix jeune, des refrains qui restent et une énergie Afro Soul Rap entre émotion, courage et nouveau départ.</p>
         <div class="hero-actions"><a class="pill" href="#musiques">Découvrir les sons ↓</a><a class="ghost" href="#apropos">À propos d’Evan</a></div>
       </div>
-      <div class="portrait reveal"><img src="evan-profile.png" alt="Portrait officiel d’Evan Delcourt"></div>
+      <div class="portrait reveal"><img src="assets/evan-profile.png" alt="Portrait officiel d’Evan Delcourt"></div>
     </section>
 
     <section id="musiques">
       <div class="wrap">
         <div class="section-head reveal"><div><div class="kicker">Rangée sons normaux</div><h2>Les chansons<br>complètes</h2></div><p>Les morceaux complets d’Evan sont présentés sur leur propre rangée.</p></div>
         <div class="releases">
-          <article class="card reveal"><div class="cover"><img src="jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button><button class="ghost fav-btn" data-title="J’SUIS QU’UN HOMME">❤️ Favori</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button><button class="ghost fav-btn" data-title="MA FINALE">❤️ Favori</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button><button class="ghost fav-btn" data-title="REPOSE EN PAIX">❤️ Favori</button></div></div></article>
         </div>
       </div>
     </section>
@@ -109,9 +111,9 @@
         <div class="shorts-copy"><div class="kicker">Rangée Shorts</div><h2>Les Shorts d’Evan</h2><p>Les vidéos courtes sont toutes rangées ici, sans être mélangées avec les chansons complètes.</p></div>
         <a class="pill" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener">Voir les Shorts ↗</a>
         <div class="short-list" aria-label="Liste des Shorts">
-          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="modern-warfare-4.png" alt="Modern Warfare 4"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>MODERN WARFARE 4</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="MODERN WARFARE 4">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="MODERN WARFARE 4">💬 Commenter</button></div></div></a>
-          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="freddys-clip-officiel.png" alt="Freddys Clip Officiel"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>FREDDYS CLIP OFFICIEL</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">💬 Commenter</button></div></div></a>
-          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover graphic calme"><span class="short-badge">SHORT</span>PAS CALME</div><div class="short-meta"><strong>PAS CALME</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="PAS CALME">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="PAS CALME">💬 Commenter</button></div></div></a>
+          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="assets/modern-warfare-4.png" alt="Modern Warfare 4"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>MODERN WARFARE 4</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="MODERN WARFARE 4">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="MODERN WARFARE 4">💬 Commenter</button><button class="ghost fav-btn" data-title="MODERN WARFARE 4">❤️ Favori</button></div></div></a>
+          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="assets/freddys-clip-officiel.png" alt="Freddys Clip Officiel"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>FREDDYS CLIP OFFICIEL</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">💬 Commenter</button><button class="ghost fav-btn" data-title="FREDDYS CLIP OFFICIEL">❤️ Favori</button></div></div></a>
+          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover graphic calme"><span class="short-badge">SHORT</span>PAS CALME</div><div class="short-meta"><strong>PAS CALME</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="PAS CALME">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="PAS CALME">💬 Commenter</button><button class="ghost fav-btn" data-title="PAS CALME">❤️ Favori</button></div></div></a>
         </div>
       </div>
     </section>
@@ -123,6 +125,16 @@
       </div>
     </section>
 
+
+
+    <section id="bibliotheque" class="wrap reveal">
+      <div class="section-head"><div><div class="kicker">❤️ ESPACE PERSONNEL</div><h2>Ma bibliothèque</h2><p class="muted">Retrouve tes favoris et tes playlists quand tu es connecté.</p></div></div>
+      <div class="library-grid">
+        <article class="library-card"><h3>❤️ Mes favoris</h3><p>Les chansons que tu veux garder sous la main.</p><a class="ghost" href="vip.html#favorites">Voir mes favoris →</a></article>
+        <article class="library-card"><h3>📋 Mes playlists</h3><p>Crée et organise tes playlists personnalisées.</p><a class="ghost" href="vip.html#playlists">Gérer mes playlists →</a></article>
+        <article class="library-card"><h3>🎧 Mon activité</h3><p>Retrouve les contenus que tu as récemment consultés.</p><a class="ghost" href="vip.html#activity">Voir mon activité →</a></article>
+      </div>
+    </section>
 
     <section id="abonnement">
       <div class="wrap">
@@ -179,7 +191,15 @@
     <div class="wrap cta reveal"><div><h2>Écouter Evan sur YouTube</h2><p>Retrouve les nouvelles sorties sur la chaîne officielle.</p></div><a class="pill" href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">Ouvrir la chaîne ↗</a></div>
   </main>
   <footer><div class="wrap foot"><span>© 2026 Evan_Delcourt</span><span>Afro Soul Rap · Canada</span></div></footer>
-  <script>
+    <div id="miniPlayer" class="mini-player" aria-live="polite">
+    <div style="font-size:1.5rem">🎵</div>
+    <div class="player-title"><strong id="playerTitle">Aucune chanson sélectionnée</strong><small>Evan Delcourt</small></div>
+    <div class="player-note">Lecture via la chaîne YouTube</div>
+    <button class="pill" type="button" id="playerYoutube">▶️ Ouvrir YouTube</button>
+    <button class="ghost" type="button" id="closePlayer" aria-label="Fermer">✕</button>
+  </div>
+
+<script>
     const API_BASE = window.EVAN_API_URL || "";
     const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.12});
     document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
@@ -313,6 +333,18 @@
     loadPremiumRanking();
     setInterval(loadPremiumRanking,30000);
 
+  
+    const youtubeChannel='https://www.youtube.com/@Evan_Delcourt-y7y';
+    const miniPlayer=document.getElementById('miniPlayer'), playerTitle=document.getElementById('playerTitle');
+    let selectedTrack='';
+    function selectTrack(title){selectedTrack=title;playerTitle.textContent=title;miniPlayer.classList.add('show');localStorage.setItem('evan_last_track',title);try{fetch(API_BASE+'/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({title,action:'Sélectionné'})})}catch{}}
+    document.querySelectorAll('.fav-btn').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();try{const r=await fetch(API_BASE+'/api/favorites/toggle',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({title:btn.dataset.title})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Connecte-toi pour ajouter un favori.');btn.classList.toggle('active',d.favorite);btn.textContent=d.favorite?'❤️ Favori':'❤️ Favori';}catch(err){alert(err.message)}}));
+    document.querySelectorAll('#musiques h3').forEach(h=>{const card=h.closest('article');if(!card)return;const title=h.textContent.trim();const actions=card.querySelector('.content-actions');if(actions&&!actions.querySelector('.play-btn')){const b=document.createElement('button');b.className='pill play-btn';b.type='button';b.textContent='▶️ Écouter';b.addEventListener('click',()=>selectTrack(title));actions.prepend(b)}});
+    document.getElementById('playerYoutube')?.addEventListener('click',()=>window.open(youtubeChannel,'_blank','noopener'));
+    document.getElementById('closePlayer')?.addEventListener('click',()=>miniPlayer.classList.remove('show'));
+    const savedTrack=localStorage.getItem('evan_last_track');if(savedTrack){selectedTrack=savedTrack;playerTitle.textContent=savedTrack;}
+
   </script>
+
 </body>
 </html>

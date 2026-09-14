@@ -89,6 +89,10 @@ try {
 }
 try { db.prepare("ALTER TABLE users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 1").run(); } catch (e) { if (!String(e.message).includes("duplicate column name")) throw e; }
 for (const col of [
+  ['bio',"TEXT NOT NULL DEFAULT ''"],
+  ['profile_photo',"TEXT NOT NULL DEFAULT ''"]
+]) { try { db.prepare(`ALTER TABLE users ADD COLUMN ${col[0]} ${col[1]}`).run(); } catch (e) { if (!String(e.message).includes('duplicate column name')) throw e; } }
+for (const col of [
   ['security_enabled','INTEGER NOT NULL DEFAULT 1'],
   ['link_protection','INTEGER NOT NULL DEFAULT 1'],
   ['spam_protection','INTEGER NOT NULL DEFAULT 1']
@@ -237,6 +241,21 @@ app.use('/api', (req,res,next) => {
   next();
 });
 
+// Compteur de visiteurs privé : accessible uniquement à l'administrateur.
+app.get('/api/admin/visitors', (req,res) => {
+  if (!isAdmin(req.authUser)) return res.status(403).json({error:'Accès administrateur requis.'});
+  const total = db.prepare("SELECT COUNT(*) c FROM visitor_logs WHERE path <> '/health'").get().c;
+  const today = db.prepare("SELECT COUNT(*) c FROM visitor_logs WHERE path <> '/health' AND date(created_at)=date('now')").get().c;
+  const uniqueToday = db.prepare("SELECT COUNT(DISTINCT ip) c FROM visitor_logs WHERE path <> '/health' AND date(created_at)=date('now')").get().c;
+  const visitors = db.prepare("SELECT ip,path,user_id,user_agent,referer,created_at FROM visitor_logs WHERE path <> '/health' ORDER BY id DESC LIMIT 100").all();
+  res.json({total,today,uniqueToday,visitors});
+});
+app.delete('/api/admin/visitors', (req,res) => {
+  if (!isAdmin(req.authUser)) return res.status(403).json({error:'Accès administrateur requis.'});
+  db.prepare("DELETE FROM visitor_logs").run();
+  res.json({ok:true});
+});
+
 app.post("/api/free-subscribe", async (req,res) => {
   const email = String(req.body.email || "").trim().toLowerCase();
   const displayName = String(req.body.displayName || "").trim().slice(0,40);
@@ -260,6 +279,26 @@ app.post("/api/free-subscribe", async (req,res) => {
 app.get("/api/me", (req,res) => {
   const user = currentUser(req);
   res.json({loggedIn: !!user, user: user || null});
+});
+
+app.get('/api/profile/me', (req,res) => {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({error:'Connexion requise.'});
+  const row = db.prepare('SELECT id,email,display_name,bio,profile_photo,subscription_status FROM users WHERE id=?').get(user.id);
+  res.json({profile:row});
+});
+
+app.post('/api/profile/me', (req,res) => {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({error:'Connexion requise.'});
+  const displayName=String(req.body.displayName||'').trim().slice(0,40);
+  const bio=String(req.body.bio||'').trim().slice(0,300);
+  const profilePhoto=String(req.body.profilePhoto||'').trim().slice(0,500);
+  if(!displayName) return res.status(400).json({error:'Le pseudo est obligatoire.'});
+  if(profilePhoto && !/^https?:\/\//i.test(profilePhoto)) return res.status(400).json({error:'La photo de profil doit être une adresse https:// ou http://.'});
+  db.prepare('UPDATE users SET display_name=?,bio=?,profile_photo=? WHERE id=?').run(displayName,bio,profilePhoto,user.id);
+  logSecurity(user.id,'profile_update','Profil modifié');
+  res.json({ok:true});
 });
 
 function clientIp(req){ return String((req.headers['x-forwarded-for']||'').split(',')[0].trim() || req.socket.remoteAddress || 'unknown').slice(0,100); }
