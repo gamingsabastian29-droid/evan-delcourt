@@ -77,21 +77,6 @@
     </div>
   </div>
 
-  <div class="site-gate" id="siteGate" aria-hidden="true">
-    <div class="gate-box" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
-      <div class="gate-icon">🔒</div>
-      <div class="kicker">ACCÈS MEMBRE</div>
-      <h2 id="gateTitle">Tout le site est verrouillé</h2>
-      <p>Pour écouter, aimer, commenter, voir les classements et accéder aux autres fonctions, connecte-toi ou crée gratuitement ton compte Evan_Delcourt.</p>
-      <div class="gate-actions">
-        <button class="pill" type="button" id="gateLogin">🔐 Se connecter</button>
-        <a class="pill" href="vip.html#auth">👤 Créer un compte</a>
-      </div>
-      <div id="publicAnnouncements" style="margin-top:18px;text-align:left"></div>
-      <p class="gate-note">🔐 Les fonctions et données personnelles restent protégées par ton compte.</p>
-    </div>
-  </div>
-
   <div class="comment-modal" id="commentModal" aria-hidden="true"><div class="login-box"><button class="login-close" id="closeComment">×</button><div class="kicker">💬 COMMENTAIRES</div><h3 id="commentTitle">Commentaires</h3><div id="commentList" class="comment-list"></div><form id="commentForm" class="subscribe-form"><textarea id="commentBody" maxlength="500" placeholder="Écris ton commentaire…" required></textarea><button class="pill" type="submit">Publier</button></form><div class="notice" id="commentNotice"></div></div></div>
 
   <main>
@@ -104,16 +89,16 @@
         <p class="lead">Une voix jeune, des refrains qui restent et une énergie Afro Soul Rap entre émotion, courage et nouveau départ.</p>
         <div class="hero-actions"><a class="pill" href="#musiques">Découvrir les sons ↓</a><a class="ghost" href="#apropos">À propos d’Evan</a></div>
       </div>
-      <div class="portrait reveal"><img src="assets/evan-profile.png" alt="Portrait officiel d’Evan Delcourt"></div>
+      <div class="portrait reveal"><img src="evan-profile.png" alt="Portrait officiel d’Evan Delcourt"></div>
     </section>
 
     <section id="musiques">
       <div class="wrap">
         <div class="section-head reveal"><div><div class="kicker">Rangée sons normaux</div><h2>Les chansons<br>complètes</h2></div><p>Les morceaux complets d’Evan sont présentés sur leur propre rangée.</p></div>
         <div class="releases">
-          <article class="card reveal"><div class="cover"><img src="assets/jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="assets/ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="assets/repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button></div></div></article>
         </div>
       </div>
     </section>
@@ -124,8 +109,8 @@
         <div class="shorts-copy"><div class="kicker">Rangée Shorts</div><h2>Les Shorts d’Evan</h2><p>Les vidéos courtes sont toutes rangées ici, sans être mélangées avec les chansons complètes.</p></div>
         <a class="pill" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener">Voir les Shorts ↗</a>
         <div class="short-list" aria-label="Liste des Shorts">
-          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="assets/modern-warfare-4.png" alt="Modern Warfare 4"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>MODERN WARFARE 4</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="MODERN WARFARE 4">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="MODERN WARFARE 4">💬 Commenter</button></div></div></a>
-          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="assets/freddys-clip-officiel.png" alt="Freddys Clip Officiel"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>FREDDYS CLIP OFFICIEL</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">💬 Commenter</button></div></div></a>
+          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="modern-warfare-4.png" alt="Modern Warfare 4"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>MODERN WARFARE 4</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="MODERN WARFARE 4">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="MODERN WARFARE 4">💬 Commenter</button></div></div></a>
+          <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover"><img src="freddys-clip-officiel.png" alt="Freddys Clip Officiel"><span class="short-badge">SHORT</span></div><div class="short-meta"><strong>FREDDYS CLIP OFFICIEL</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="FREDDYS CLIP OFFICIEL">💬 Commenter</button></div></div></a>
           <a class="short-card" href="https://www.youtube.com/@Evan_Delcourt-y7y/shorts" target="_blank" rel="noopener"><div class="short-cover graphic calme"><span class="short-badge">SHORT</span>PAS CALME</div><div class="short-meta"><strong>PAS CALME</strong><span>Voir sur YouTube</span><div class="content-actions"><button class="ghost like-btn" data-type="short" data-title="PAS CALME">👍 J’aime</button><button class="ghost comment-btn" data-type="short" data-title="PAS CALME">💬 Commenter</button></div></div></a>
         </div>
       </div>
@@ -270,24 +255,6 @@
           loginNotice.classList.add('show');
         }
       });
-    }
-    const siteGate=document.getElementById('siteGate');
-    const gateLogin=document.getElementById('gateLogin');
-    gateLogin?.addEventListener('click',()=>{ hideGate(); showLogin(); });
-    function showGate(){ if(siteGate){siteGate.classList.add('show');siteGate.setAttribute('aria-hidden','false');document.body.classList.add('locked-site');} }
-    function hideGate(){ if(siteGate){siteGate.classList.remove('show');siteGate.setAttribute('aria-hidden','true');document.body.classList.remove('locked-site');} }
-    async function refreshAccountButton(){
-      try{
-        const r=await fetch(API_BASE+'/api/me',{credentials:'same-origin'}); const d=await r.json();
-        if(d.loggedIn){
-          hideGate();
-          openLogin?.style.setProperty('display','none');
-          if(openAccount){openAccount.style.display='inline-flex'; openAccount.textContent='👤 '+(d.user?.display_name||'Mon compte');}
-        } else {
-          showGate();
-          if(openAccount) openAccount.style.display='none';
-        }
-      }catch{ showGate(); }
     }
     async function loadPublicAnnouncements(){try{const r=await fetch(API_BASE+'/api/announcements');const d=await r.json();const box=document.getElementById('publicAnnouncements');if(!box)return;box.innerHTML=d.announcements?.length?`<div class="panel" style="padding:16px"><div class="kicker">📢 ANNONCES PUBLIQUES</div>${d.announcements.slice(0,5).map(x=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>${escapeHtml(x.title)}</b><div style="color:var(--muted)">${escapeHtml(x.message)}</div><small style="color:var(--muted)">${escapeHtml(x.created_at)}</small></div>`).join('')}</div>`:'';}catch{}}
     loadPublicAnnouncements();
