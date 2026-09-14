@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS security_events (id INTEGER PRIMARY KEY AUTOINCREMENT
 CREATE TABLE IF NOT EXISTS visitor_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, path TEXT NOT NULL, method TEXT NOT NULL, user_id INTEGER, user_agent TEXT DEFAULT '', referer TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL);
 CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, type TEXT NOT NULL, title TEXT NOT NULL, message TEXT NOT NULL, read_at TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS user_sessions (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, user_agent TEXT DEFAULT '', ip TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, last_seen TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS friendships (id INTEGER PRIMARY KEY AUTOINCREMENT, requester_id INTEGER NOT NULL, addressee_id INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(requester_id,addressee_id), FOREIGN KEY(requester_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(addressee_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS private_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, sender_id INTEGER NOT NULL, recipient_id INTEGER NOT NULL, body TEXT NOT NULL, read_at TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(sender_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(recipient_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS oauth_accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, provider TEXT NOT NULL, provider_user_id TEXT, provider_name TEXT, access_token TEXT, refresh_token TEXT, expires_at INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS email_verifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, purpose TEXT NOT NULL, code_hash TEXT NOT NULL, new_password_hash TEXT, expires_at TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, used_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 `);
@@ -182,7 +184,7 @@ app.post("/api/stripe/webhook", express.raw({type: "application/json"}), (req, r
   res.json({received: true});
 });
 
-app.use(express.json({ limit: "100kb" }));
+app.use(express.json({ limit: "1mb" }));
 
 const mailTransport = (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
   ? nodemailer.createTransport({
@@ -296,7 +298,18 @@ app.post("/api/free-subscribe", async (req,res) => {
 
 app.get("/api/me", (req,res) => {
   const user = currentUser(req);
-  res.json({loggedIn: !!user, user: user || null});
+  if (!user) return res.json({loggedIn:false, user:null});
+  const profile = db.prepare("SELECT bio,profile_photo FROM users WHERE id=?").get(user.id) || {};
+  const xp = Number(db.prepare(`SELECT (25 +
+      (SELECT COUNT(*) FROM activity a WHERE a.user_id=?)*10 +
+      (SELECT COUNT(*) FROM likes l WHERE l.user_id=?)*5 +
+      (SELECT COUNT(*) FROM comments c WHERE c.user_id=?)*15 +
+      (SELECT COUNT(*) FROM comment_replies cr WHERE cr.user_id=?)*10 +
+      CASE WHEN julianday('now')-julianday((SELECT created_at FROM users WHERE id=?)) >= 7 THEN 25 ELSE 0 END +
+      CASE WHEN (SELECT subscription_status FROM users WHERE id=?) IN ('active','trialing') THEN 100 ELSE 0 END) AS xp`).get(user.id,user.id,user.id,user.id,user.id,user.id)?.xp || 0);
+  const level=Math.max(1,Math.floor(xp/100)+1);
+  const badges=Number(db.prepare("SELECT COUNT(*) c FROM badges WHERE user_id=?").get(user.id)?.c||0);
+  res.json({loggedIn:true,user:{id:user.id,email:user.email,display_name:user.display_name,member_id:user.member_id,subscription_status:user.subscription_status,created_at:user.created_at,profile_photo:profile.profile_photo||'',bio:profile.bio||'',xp,level,badges,title:level>=10?'Membre légendaire':level>=5?'Membre confirmé':'Nouveau membre',online:true}});
 });
 
 app.get('/api/profile/me', (req,res) => {
@@ -311,9 +324,10 @@ app.post('/api/profile/me', (req,res) => {
   if (!user) return res.status(401).json({error:'Connexion requise.'});
   const displayName=String(req.body.displayName||'').trim().slice(0,40);
   const bio=String(req.body.bio||'').trim().slice(0,300);
-  const profilePhoto=String(req.body.profilePhoto||'').trim().slice(0,500);
+  const profilePhoto=String(req.body.profilePhoto||'').trim().slice(0,800000);
   if(!displayName) return res.status(400).json({error:'Le pseudo est obligatoire.'});
-  if(profilePhoto && !/^https?:\/\//i.test(profilePhoto)) return res.status(400).json({error:'La photo de profil doit être une adresse https:// ou http://.'});
+  if(profilePhoto && !(/^(https?:\/\/|data:image\/(?:jpeg|png|webp);base64,)/i.test(profilePhoto))) return res.status(400).json({error:'La photo doit être une image depuis ton PC ou une adresse http(s).'});
+  if(profilePhoto.length>800000) return res.status(400).json({error:'Photo trop volumineuse après optimisation.'});
   db.prepare('UPDATE users SET display_name=?,bio=?,profile_photo=? WHERE id=?').run(displayName,bio,profilePhoto,user.id);
   logSecurity(user.id,'profile_update','Profil modifié');
   res.json({ok:true});
@@ -523,9 +537,20 @@ app.post("/api/subscription/resume", async (req,res) => {
 
 app.get('/api/community/members',(req,res)=>{
   const rows=db.prepare(`SELECT u.id,u.display_name,u.member_id,u.subscription_status,u.created_at,
-    CASE WHEN EXISTS(SELECT 1 FROM user_sessions s WHERE s.user_id=u.id AND s.last_seen >= datetime('now','-5 minutes')) THEN 1 ELSE 0 END AS online
+    CASE WHEN EXISTS(SELECT 1 FROM user_sessions s WHERE s.user_id=u.id AND s.last_seen >= datetime('now','-5 minutes')) THEN 1 ELSE 0 END AS online,
+    (25 + (SELECT COUNT(*) FROM activity a WHERE a.user_id=u.id)*10 +
+      (SELECT COUNT(*) FROM likes l WHERE l.user_id=u.id)*5 +
+      (SELECT COUNT(*) FROM comments c WHERE c.user_id=u.id)*15 +
+      (SELECT COUNT(*) FROM comment_replies cr WHERE cr.user_id=u.id)*10 +
+      CASE WHEN julianday('now')-julianday(u.created_at) >= 7 THEN 25 ELSE 0 END +
+      CASE WHEN u.subscription_status IN ('active','trialing') THEN 100 ELSE 0 END) AS xp,
+    (SELECT COUNT(*) FROM badges b WHERE b.user_id=u.id) AS badge_count
     FROM users u ORDER BY online DESC, u.display_name COLLATE NOCASE ASC LIMIT 200`).all();
-  res.json({members:rows.map(x=>({name:x.display_name||'Membre',accountId:x.member_id,status:['active','trialing'].includes(x.subscription_status)?'VIP':'FREE',online:!!x.online}))});
+  res.json({members:rows.map(x=>{
+    const xp=Number(x.xp||0), level=Math.max(1,Math.floor(xp/100)+1);
+    const title=level>=10?'Membre légendaire':level>=5?'Membre confirmé':'Nouveau membre';
+    return {name:x.display_name||'Membre',accountId:x.member_id,status:['active','trialing'].includes(x.subscription_status)?'VIP':'FREE',online:!!x.online,xp,level,badges:Number(x.badge_count||0),title};
+  })});
 });
 
 function oauthBase(){ return String(process.env.BASE_URL||`http://localhost:${process.env.PORT||3000}`).replace(/\/$/,''); }
@@ -803,6 +828,25 @@ app.get("/api/rewards", (req,res) => {
   const purchases=db.prepare("SELECT reward_key,reward_name,cost,created_at FROM reward_purchases WHERE user_id=? ORDER BY created_at DESC LIMIT 30").all(user.id);
   res.json({xp,level,nextLevelXp:next,points,stats:{activity,likes,comments,replies},badges:defs.map(d=>({key:d[0],name:d[1],description:d[2],unlocked:d[3]})),purchases});
 });
+
+// Communauté : amis, messages privés et classement. Les données privées restent limitées aux comptes concernés.
+app.get('/api/community/members',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.status(401).json({error:'Connexion requise.'});
+  const q=String(req.query.q||'').trim().slice(0,40);
+  const users=db.prepare(`SELECT id,display_name,member_id,subscription_status,created_at,
+    CASE WHEN EXISTS(SELECT 1 FROM user_sessions s WHERE s.user_id=users.id AND s.last_seen>=datetime('now','-5 minutes')) THEN 1 ELSE 0 END online,
+    (25 + (SELECT COUNT(*) FROM activity a WHERE a.user_id=users.id)*10 + (SELECT COUNT(*) FROM likes l WHERE l.user_id=users.id)*5 + (SELECT COUNT(*) FROM comments c WHERE c.user_id=users.id)*15 + (SELECT COUNT(*) FROM comment_replies r WHERE r.user_id=users.id)*10 + CASE WHEN subscription_status IN ('active','trialing') THEN 100 ELSE 0 END) xp
+    FROM users WHERE id<>? AND (?='' OR display_name LIKE ? OR CAST(member_id AS TEXT)=?) ORDER BY online DESC, xp DESC LIMIT 50`).all(u.id,q,'%'+q+'%',q);
+  res.json({members:users.map(x=>({...x,member_id:String(x.member_id).padStart(4,'0'),level:Math.max(1,Math.floor(x.xp/100)+1),title:x.xp>=1000?'Membre légendaire':x.xp>=500?'Membre confirmé':'Nouveau membre'}))});
+});
+app.get('/api/friends',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const rows=db.prepare(`SELECT f.id,f.status,f.requester_id,f.addressee_id,CASE WHEN f.requester_id=? THEN b.id ELSE a.id END user_id,CASE WHEN f.requester_id=? THEN b.display_name ELSE a.display_name END display_name,CASE WHEN f.requester_id=? THEN b.member_id ELSE a.member_id END member_id,CASE WHEN f.requester_id=? THEN b.subscription_status ELSE a.subscription_status END subscription_status FROM friendships f JOIN users a ON a.id=f.requester_id JOIN users b ON b.id=f.addressee_id WHERE f.requester_id=? OR f.addressee_id=? ORDER BY f.id DESC`).all(u.id,u.id,u.id,u.id,u.id,u.id);res.json({friends:rows.map(x=>({...x,member_id:String(x.member_id).padStart(4,'0')}))});});
+app.post('/api/friends/request',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const mid=Number(req.body.memberId);const target=db.prepare('SELECT id,display_name FROM users WHERE member_id=?').get(mid);if(!target||target.id===u.id)return res.status(400).json({error:'Membre introuvable.'});const exists=db.prepare('SELECT * FROM friendships WHERE (requester_id=? AND addressee_id=?) OR (requester_id=? AND addressee_id=?)').get(u.id,target.id,target.id,u.id);if(exists){if(exists.status==='pending'&&exists.addressee_id===u.id){db.prepare("UPDATE friendships SET status='accepted' WHERE id=?").run(exists.id);notify(target.id,'friend','Ami accepté',u.display_name+' a accepté ta demande.');return res.json({ok:true,status:'accepted'});}return res.status(409).json({error:'Une relation existe déjà.'});}db.prepare("INSERT INTO friendships(requester_id,addressee_id,status) VALUES(?,?, 'pending')").run(u.id,target.id);notify(target.id,'friend','Nouvelle demande d’ami',u.display_name+' veut être ton ami.');res.json({ok:true,status:'pending'});});
+app.post('/api/friends/accept',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const id=Number(req.body.id);const r=db.prepare("SELECT * FROM friendships WHERE id=? AND addressee_id=? AND status='pending'").get(id,u.id);if(!r)return res.status(404).json({error:'Demande introuvable.'});db.prepare("UPDATE friendships SET status='accepted' WHERE id=?").run(id);notify(r.requester_id,'friend','Demande acceptée',u.display_name+' a accepté ta demande.');res.json({ok:true});});
+app.delete('/api/friends/:id',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});db.prepare('DELETE FROM friendships WHERE id=? AND (requester_id=? OR addressee_id=?)').run(Number(req.params.id),u.id,u.id);res.json({ok:true});});
+app.get('/api/messages',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const mid=Number(req.query.memberId||0);if(mid){db.prepare('UPDATE private_messages SET read_at=CURRENT_TIMESTAMP WHERE recipient_id=? AND sender_id=?').run(u.id,mid);const msgs=db.prepare(`SELECT m.id,m.sender_id,m.recipient_id,m.body,m.created_at,a.display_name sender_name,a.member_id sender_member_id FROM private_messages m JOIN users a ON a.id=m.sender_id WHERE (m.sender_id=? AND m.recipient_id=?) OR (m.sender_id=? AND m.recipient_id=?) ORDER BY m.id ASC LIMIT 100`).all(u.id,mid,mid,u.id);return res.json({messages:msgs});}const conv=db.prepare(`SELECT u.id,u.display_name,u.member_id,MAX(m.created_at) last_message,(SELECT body FROM private_messages x WHERE ((x.sender_id=? AND x.recipient_id=u.id) OR (x.sender_id=u.id AND x.recipient_id=?)) ORDER BY x.id DESC LIMIT 1) body FROM users u JOIN private_messages m ON ((m.sender_id=? AND m.recipient_id=u.id) OR (m.sender_id=u.id AND m.recipient_id=?)) WHERE u.id<>? GROUP BY u.id ORDER BY last_message DESC LIMIT 30`).all(u.id,u.id,u.id,u.id,u.id);res.json({conversations:conv.map(x=>({...x,member_id:String(x.member_id).padStart(4,'0')}))});});
+app.post('/api/messages',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const mid=Number(req.body.memberId),body=String(req.body.body||'').trim().slice(0,1000);const target=db.prepare('SELECT id FROM users WHERE member_id=?').get(mid);if(!target||target.id===u.id)return res.status(400).json({error:'Membre introuvable.'});if(!body)return res.status(400).json({error:'Message vide.'});const m=moderateText(body);if(m.blocked)return res.status(400).json({error:'Message bloqué : contenu interdit détecté.'});db.prepare('INSERT INTO private_messages(sender_id,recipient_id,body) VALUES(?,?,?)').run(u.id,target.id,body);notify(target.id,'message','Nouveau message privé',u.display_name+' t’a envoyé un message.');res.json({ok:true});});
+app.get('/api/leaderboard',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const users=db.prepare(`SELECT id,display_name,member_id,subscription_status,(25+(SELECT COUNT(*) FROM activity a WHERE a.user_id=users.id)*10+(SELECT COUNT(*) FROM likes l WHERE l.user_id=users.id)*5+(SELECT COUNT(*) FROM comments c WHERE c.user_id=users.id)*15+(SELECT COUNT(*) FROM comment_replies r WHERE r.user_id=users.id)*10+CASE WHEN subscription_status IN ('active','trialing') THEN 100 ELSE 0 END) xp FROM users ORDER BY xp DESC,id ASC LIMIT 100`).all();res.json({leaderboard:users.map((x,i)=>({...x,rank:i+1,member_id:String(x.member_id).padStart(4,'0'),level:Math.max(1,Math.floor(x.xp/100)+1)}))});});
+app.get('/api/challenges',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const activity=db.prepare('SELECT COUNT(*) c FROM activity WHERE user_id=? AND date(created_at)=date(\'now\')').get(u.id).c;const likes=db.prepare('SELECT COUNT(*) c FROM likes WHERE user_id=? AND date(created_at)=date(\'now\')').get(u.id).c;res.json({challenges:[{key:'daily-listen',name:'🎵 Découvrir 3 activités',goal:3,progress:Math.min(3,activity),reward:25},{key:'daily-like',name:'❤️ Aimer 2 contenus',goal:2,progress:Math.min(2,likes),reward:20},{key:'social',name:'💬 Faire une action sociale',goal:1,progress:Math.min(1,db.prepare("SELECT COUNT(*) c FROM comments WHERE user_id=? AND date(created_at)=date('now')").get(u.id).c),reward:30}]});});
 
 const REWARD_SHOP=[
   {key:'profile-frame',name:'🖼️ Cadre spécial du profil',cost:50,description:'Un cadre spécial à afficher sur ton profil.'},

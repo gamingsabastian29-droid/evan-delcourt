@@ -54,6 +54,8 @@
 
     .site-gate{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(5,6,15,.82);backdrop-filter:blur(14px)}
     .site-gate.show{display:flex}.gate-box{width:min(560px,100%);padding:34px;border:1px solid rgba(255,93,177,.35);border-radius:30px;background:linear-gradient(145deg,rgba(17,21,43,.98),rgba(10,12,27,.98));box-shadow:0 30px 100px rgba(0,0,0,.65);text-align:center}.gate-icon{font-size:3rem;margin-bottom:10px}.gate-box h2{font-size:clamp(2rem,6vw,3.4rem);line-height:1;margin:0 0 12px}.gate-box p{color:var(--muted);margin:0 auto 24px;max-width:470px}.gate-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.gate-actions a,.gate-actions button{border:0;cursor:pointer}.gate-note{font-size:.82rem!important;margin-top:18px!important;margin-bottom:0!important}
+    .account-summary{display:none;margin:14px 0 6px;padding:12px 16px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,rgba(109,114,255,.13),rgba(255,93,177,.07));align-items:center;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.15)}
+    .account-summary.show{display:flex}.account-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(169,140,255,.75);background:#171a31}.account-avatar-fallback{display:flex;align-items:center;justify-content:center;font-size:24px}.account-summary-main{min-width:0;flex:1}.account-summary-name{font-weight:900;font-size:1.02rem}.account-summary-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;font-size:.82rem}.account-summary-meta span{padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}.account-online{font-weight:800}.account-online i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#20d66b;box-shadow:0 0 8px #20d66b;margin-right:5px}.account-summary-level{font-weight:800;color:#b9a7ff}.account-summary-link{text-decoration:none;white-space:nowrap}
 </style></head>
 <body>
   <header class="wrap">
@@ -62,6 +64,8 @@
       <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#notifications">🔔 Nouveautés</a><a href="#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
     </nav>
   </header>
+
+  <div class="wrap"><div class="account-summary" id="accountSummary" aria-live="polite"><div id="accountAvatarWrap"><img id="accountAvatar" class="account-avatar" alt="Photo de profil"><div id="accountAvatarFallback" class="account-avatar account-avatar-fallback" style="display:none">👤</div></div><div class="account-summary-main"><div class="account-summary-name" id="accountSummaryName">Evan_Delcourt</div><div class="account-summary-meta"><span>🆔 <b id="accountSummaryId">#----</b></span><span class="account-online"><i></i>En ligne</span><span class="account-summary-level">💎 Niveau <b id="accountSummaryLevel">1</b></span><span>🏅 <b id="accountSummaryBadges">0</b> badges</span><span>⭐ <b id="accountSummaryXp">0</b> XP</span></div></div><a class="pill account-summary-link" href="vip.html#profile">👤 Mon profil</a></div></div>
 
   <div class="login-modal" id="loginModal" aria-hidden="true">
     <div class="login-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -343,6 +347,25 @@
     document.getElementById('playerYoutube')?.addEventListener('click',()=>window.open(youtubeChannel,'_blank','noopener'));
     document.getElementById('closePlayer')?.addEventListener('click',()=>miniPlayer.classList.remove('show'));
     const savedTrack=localStorage.getItem('evan_last_track');if(savedTrack){selectedTrack=savedTrack;playerTitle.textContent=savedTrack;}
+
+    async function loadAccountSummary(){
+      try{
+        const r=await fetch(API_BASE+'/api/me',{credentials:'same-origin'}); const d=await r.json();
+        const box=document.getElementById('accountSummary');
+        if(!d.loggedIn){box?.classList.remove('show');return;}
+        box?.classList.add('show');
+        const u=d.user||{};
+        document.getElementById('accountSummaryName').textContent=u.display_name||'Evan_Delcourt';
+        document.getElementById('accountSummaryId').textContent='#'+String(u.member_id||'').padStart(4,'0');
+        document.getElementById('accountSummaryLevel').textContent=u.level||1;
+        document.getElementById('accountSummaryBadges').textContent=u.badges||0;
+        document.getElementById('accountSummaryXp').textContent=Number(u.xp||0).toLocaleString('fr-FR');
+        const img=document.getElementById('accountAvatar'), fb=document.getElementById('accountAvatarFallback');
+        if(u.profile_photo){img.src=u.profile_photo;img.style.display='block';fb.style.display='none';}else{img.style.display='none';fb.style.display='flex';}
+      }catch{}
+    }
+    loadAccountSummary();
+    setInterval(loadAccountSummary,30000);
 
   </script>
 
