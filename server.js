@@ -674,7 +674,7 @@ app.get('/api/security', (req,res) => {
   const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
   const st=securitySettings(u.id);
   const events=db.prepare('SELECT type,detail,created_at FROM security_events WHERE user_id=? ORDER BY id DESC LIMIT 20').all(u.id);
-  const sessions=db.prepare('SELECT id,ip,user_agent,created_at,last_seen FROM user_sessions WHERE user_id=? ORDER BY last_seen DESC').all(u.id).map(x=>({...x,current:x.id===req.session.sessionId}));
+  const sessions=db.prepare('SELECT id,created_at,last_seen FROM user_sessions WHERE user_id=? ORDER BY last_seen DESC').all(u.id).map(x=>({...x,current:x.id===req.session.sessionId,device:'Appareil connecté'}));
   res.json({enabled:!!st.security_enabled,linkProtection:!!st.link_protection,spamProtection:!!st.spam_protection,sessions,events});
 });
 app.post('/api/security/settings', (req,res) => {
