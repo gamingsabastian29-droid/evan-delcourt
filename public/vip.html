@@ -9,7 +9,33 @@
 @media(max-width:700px){.wrap{margin:12px auto;padding:0 10px}.card{padding:15px;border-radius:16px;margin:10px 0}h1{font-size:1.5rem}button,input,select{font-size:16px}.grid{grid-template-columns:1fr!important}.benefit-grid{grid-template-columns:1fr!important}}
 </style></head><body><main class="wrap">
 <h1>👤 Mon espace Evan_Delcourt</h1><p class="muted">Ton compte, tes favoris, ton activité et ton abonnement au même endroit.</p>
-<section id="auth" class="card"><div class="grid"><div><h2>Créer ton compte</h2><input id="displayName" placeholder="Nom / pseudo" maxlength="40"><input id="email" type="email" placeholder="Courriel" autocomplete="email"><input id="password" type="password" placeholder="Mot de passe (8 caractères minimum)" autocomplete="new-password"><button onclick="register()">Créer mon compte</button></div><div><h2>🔐 Se connecter</h2><p class="muted">Déjà inscrit ? Connecte-toi avec ton courriel et ton mot de passe.</p><input id="loginEmail" type="email" placeholder="Ton courriel" autocomplete="email"><input id="loginPassword" type="password" placeholder="Ton mot de passe" autocomplete="current-password"><div id="login2faArea" style="display:none;padding:12px;border:1px solid #30334d;border-radius:14px;background:#0d1021"><b>📧 Code de sécurité</b><p class="muted small">Un code à 6 chiffres a été envoyé à ton adresse courriel.</p><input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code à 6 chiffres"><button class="ghost" onclick="verifyLoginCode()">✅ Vérifier le code</button><button class="ghost" onclick="resendLoginCode()">📨 Renvoyer le code</button></div><button onclick="login()">Se connecter</button></div></div><p id="msg"></p></section>
+<section id="auth" class="card">
+  <div class="grid">
+    <div>
+      <h2>🔐 Se connecter</h2>
+      <p class="muted">Déjà inscrit ? Entre ton courriel et ton mot de passe.</p>
+      <input id="loginEmail" type="email" placeholder="Ton courriel" autocomplete="email">
+      <input id="loginPassword" type="password" placeholder="Ton mot de passe" autocomplete="current-password">
+      <div id="login2faArea" style="display:none;padding:12px;border:1px solid #30334d;border-radius:14px;background:#0d1021">
+        <b>📧 Code de sécurité</b>
+        <p class="muted small">Un code à 6 chiffres a été envoyé à ton adresse courriel.</p>
+        <input id="loginCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code à 6 chiffres">
+        <button class="ghost" type="button" onclick="verifyLoginCode()">✅ Vérifier le code</button>
+        <button class="ghost" type="button" onclick="resendLoginCode()">📨 Renvoyer le code</button>
+      </div>
+      <button type="button" id="loginBtn" onclick="login()">Se connecter</button>
+    </div>
+    <div>
+      <h2>👤 Créer un compte</h2>
+      <p class="muted">Pas encore de compte ? Crée-le ici.</p>
+      <input id="registerName" placeholder="Nom / pseudo" maxlength="40" autocomplete="nickname">
+      <input id="registerEmail" type="email" placeholder="Ton courriel" autocomplete="email">
+      <input id="registerPassword" type="password" placeholder="Mot de passe (8 caractères minimum)" autocomplete="new-password">
+      <button type="button" id="registerBtn" onclick="register()">Créer mon compte</button>
+    </div>
+  </div>
+  <p id="msg"></p>
+</section>
 <section id="app" class="hide">
 <div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><h2 id="welcome" style="margin:0"></h2><p id="status" class="muted"></p></div><span id="badge" class="badge"></span></div><div class="grid3" style="margin-top:16px"><div class="stat"><span>🔔 FREE</span><b id="freeCount">0</b><small class="muted">membres gratuits</small></div><div class="stat"><span>⭐ VIP</span><b id="vipCount">0</b><small class="muted">membres VIP</small></div><div class="stat"><span>🎵 Activité</span><b id="activityCount">0</b><small class="muted">éléments récents</small></div></div></div>
 <div class="grid">
@@ -45,10 +71,59 @@ async function markNotificationsRead(){try{await api('/api/notifications/read',{
 async function loadDashboard(){let d=await api('/api/dashboard');$('freeCount').textContent=d.counts.free;$('vipCount').textContent=d.counts.vip;$('activityCount').textContent=d.activity.length;$('dashboardText').innerHTML=d.isVip?'⭐ Tu as accès aux fonctionnalités et contenus réservés aux membres VIP.':'🔔 Ton compte est gratuit. Certaines fonctionnalités et contenus restent réservés aux membres VIP.';$('favorites').innerHTML=d.favorites.length?d.favorites.map(x=>`<div class="item">❤️ ${esc(x.title)}</div>`).join(''):'<p class="muted">Aucun favori pour le moment.</p>';$('activity').innerHTML=d.activity.length?d.activity.map(x=>`<div class="item">${esc(x.action)} : <b>${esc(x.title)}</b></div>`).join(''):'<p class="muted">Aucune activité récente.</p>';$('playlists').innerHTML=d.playlists.length?d.playlists.map(x=>`<div class="item">📋 ${esc(x.name)} <button class="ghost small" onclick="addToPlaylist(${x.id})">+ Ajouter un titre</button></div>`).join(''):'<p class="muted">Aucune playlist.</p>';$('notifications').innerHTML=d.announcements.length?d.announcements.map(x=>`<div class="item">🔔 <b>${esc(x.title)}</b><br><span class="muted">${esc(x.message)}</span></div>`).join(''):'<p class="muted">Aucune notification.</p>';$('messages').innerHTML=d.announcements.length?d.announcements.map(x=>`<div class="item"><b>${esc(x.title)}</b><br>${esc(x.message)}</div>`).join(''):'<p class="muted">Aucun message.</p>';await loadVipContent();await loadRanking();await loadRewards();await loadSettings();await loadProjects()}
 async function loadVipContent(){try{let d=await api('/api/vip-content');$('vipBox').innerHTML='<div>'+d.content.map(x=>`<div class="item">⭐ ${esc(x)}</div>`).join('')+'</div>'}catch(e){$('vipBox').innerHTML='<div class="locked"><p>🔒 Contenu VIP verrouillé.</p><p class="muted">Passe à Evan VIP pour débloquer plus de contenu et de fonctionnalités.</p></div>'}}
 async function loadRanking(){try{let d=await api('/api/premium-ranking');let all=[...(d.freeRanking||[]).map(x=>({...x,rankLabel:'🔔'})),...(d.ranking||[]).map(x=>({...x,rankLabel:x.rank<=3?['🥇','🥈','🥉'][x.rank-1]:'#'+x.rank}))];$('ranking').innerHTML=all.length?all.map(x=>`<div class="item"><b>${x.rankLabel} ${esc(x.name)}</b> <span class="badge ${x.status==='VIP'?'vip':'free'}">${x.status==='VIP'?'⭐ VIP':'🔔 FREE'}</span></div>`).join(''):'<p class="muted">Aucun membre pour le moment.</p>'}catch(e){$('ranking').innerHTML='<p class="muted">Impossible de charger le classement.</p>'}}
-async function register(){try{await api('/api/register',{method:'POST',body:JSON.stringify({displayName:$('displayName').value,email:$('email').value,password:$('password').value})});await refresh()}catch(e){showMsg(e.message)}}
-async function login(){try{let d=await api('/api/login',{method:'POST',body:JSON.stringify({email:$('loginEmail').value,password:$('loginPassword').value})});if(d.requiresCode){$('login2faArea').style.display='block';$('loginCode').focus();showMsg('Code envoyé à ton adresse courriel.',true);return}await refresh()}catch(e){showMsg(e.message)}}
-async function verifyLoginCode(){try{await api('/api/login/verify',{method:'POST',body:JSON.stringify({code:$('loginCode').value.trim()})});await refresh()}catch(e){showMsg(e.message)}}
-async function resendLoginCode(){try{await api('/api/login/resend-code',{method:'POST'});showMsg('Nouveau code envoyé.',true)}catch(e){showMsg(e.message)}}
+async function login(){
+ const btn=$('loginBtn');
+ if(btn)btn.disabled=true;
+ try{
+   const email=$('loginEmail').value.trim();
+   const password=$('loginPassword').value;
+   if(!email||!email.includes('@')||password.length<8){
+     showMsg('Entre un courriel valide et un mot de passe de 8 caractères minimum.');
+     return;
+   }
+   const d=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});
+   if(d.requiresCode){
+     $('login2faArea').style.display='block';
+     $('loginCode').focus();
+     showMsg('Code envoyé à ton adresse courriel.',true);
+     return;
+   }
+   showMsg('Connexion réussie !',true);
+   await refresh();
+ }catch(e){showMsg(e.message)}
+ finally{if(btn)btn.disabled=false}
+}
+async function register(){
+ const btn=$('registerBtn');
+ if(btn)btn.disabled=true;
+ try{
+   const displayName=$('registerName').value.trim();
+   const email=$('registerEmail').value.trim();
+   const password=$('registerPassword').value;
+   if(!displayName||!email||!email.includes('@')||password.length<8){
+     showMsg('Remplis le pseudo, un courriel valide et un mot de passe de 8 caractères minimum.');
+     return;
+   }
+   const d=await api('/api/register',{method:'POST',body:JSON.stringify({displayName,email,password})});
+   if(!d.ok)throw Error(d.error||'Création du compte impossible.');
+   showMsg('Compte créé ! Connexion en cours…',true);
+   await refresh();
+ }catch(e){showMsg(e.message)}
+ finally{if(btn)btn.disabled=false}
+}
+
+async function verifyLoginCode(){
+ try{
+   await api('/api/login/verify',{method:'POST',body:JSON.stringify({code:$('loginCode').value.trim()})});
+   await refresh();
+ }catch(e){showMsg(e.message)}
+}
+async function resendLoginCode(){
+ try{
+   await api('/api/login/resend-code',{method:'POST'});
+   showMsg('Nouveau code envoyé.',true);
+ }catch(e){showMsg(e.message)}
+}
 async function logout(){await api('/api/logout',{method:'POST'});location.reload()}
 async function subscribe(){try{let d=await api('/api/create-checkout-session',{method:'POST'});location.href=d.url}catch(e){alert(e.message)}}
 async function portal(){try{let d=await api('/api/create-portal-session',{method:'POST'});location.href=d.url}catch(e){alert(e.message)}}

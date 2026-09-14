@@ -14,6 +14,8 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 }
 
 const app = express();
+// Render terminates HTTPS at its proxy. Trust the proxy so secure session cookies are set correctly.
+app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const db = new Database("members.db");
@@ -227,7 +229,7 @@ function currentUser(req) {
 // Accès membre : toutes les fonctions du site/API restent verrouillées tant que la personne n'est pas connectée.
 // Exceptions : inscription, connexion, déconnexion, état de session, abonnement FREE initial et webhook Stripe.
 app.use('/api', (req,res,next) => {
-  const open = new Set(['/api/me','/api/register','/api/login','/api/login/verify','/api/login/resend-code','/api/logout','/api/free-subscribe','/api/stripe/webhook','/api/announcements']);
+  const open = new Set(['/api/me','/api/register','/api/access','/api/login','/api/login/verify','/api/login/resend-code','/api/logout','/api/free-subscribe','/api/stripe/webhook','/api/announcements']);
   if (open.has(req.path)) return next();
   const user = currentUser(req);
   if (!user) return res.status(401).json({error:'Accès verrouillé. Connecte-toi ou crée un compte pour continuer.'});
@@ -276,11 +278,59 @@ app.post("/api/register", async (req,res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     const result = db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)").run(email, displayName, hash, "inactive");
-    req.session.userId = result.lastInsertRowid; createSession(req, result.lastInsertRowid);
+    req.session.userId = Number(result.lastInsertRowid); createSession(req, Number(result.lastInsertRowid));
     db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email, displayName);
     res.json({ok:true});
   } catch {
     res.status(409).json({error:"Ce courriel existe déjà."});
+  }
+});
+
+app.post("/api/access", async (req,res) => {
+  const email=String(req.body.email||'').trim().toLowerCase();
+  const displayName=String(req.body.displayName||'').trim().slice(0,40);
+  const password=String(req.body.password||'');
+  if(!email || !email.includes("@") || password.length<8)
+    return res.status(400).json({error:"Courriel ou mot de passe invalide (8 caractères minimum)."});
+
+  const user=db.prepare('SELECT * FROM users WHERE email=?').get(email);
+
+  // Compte déjà existant : on utilise exactement le même parcours que la connexion normale.
+  if(user){
+    const ip=clientIp(req);
+    const since=new Date(Date.now()-15*60000).toISOString().replace('T',' ').replace('Z','').slice(0,19);
+    const recent=db.prepare('SELECT COUNT(*) c FROM login_attempts WHERE email=? AND ip=? AND success=0 AND created_at>=?').get(email,ip,since).c;
+    if(recent>=5)return res.status(429).json({error:'Trop de tentatives. Réessaie dans quelques minutes.'});
+    if(!(await bcrypt.compare(password,user.password_hash))){
+      db.prepare('INSERT INTO login_attempts(ip,email,success) VALUES(?,?,0)').run(ip,email);
+      logSecurity(user.id,'login_failed','Tentative de connexion échouée');
+      return res.status(401).json({error:'Courriel ou mot de passe incorrect.'});
+    }
+    db.prepare('INSERT INTO login_attempts(ip,email,success) VALUES(?,?,1)').run(ip,email);
+    try{
+      const id=await createVerification(user.id,'login');
+      req.session.pendingLoginUserId=user.id;
+      req.session.pendingLoginVerificationId=Number(id);
+      logSecurity(user.id,'login_code_sent','Code de connexion envoyé par courriel');
+      return res.json({ok:true,requiresCode:true,message:'Un code de sécurité a été envoyé à ton adresse courriel.'});
+    }catch(e){
+      return res.status(503).json({error:e.message||'Impossible d’envoyer le code de sécurité.'});
+    }
+  }
+
+  // Nouveau compte : création automatique puis connexion immédiate.
+  if(!displayName)
+    return res.status(400).json({error:"Entre ton nom ou ton pseudo pour créer ton compte."});
+  try{
+    const hash=await bcrypt.hash(password,12);
+    const result=db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)")
+      .run(email,displayName,hash,"inactive");
+    const userId=Number(result.lastInsertRowid);
+    db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email,displayName);
+    createSession(req,userId);
+    return res.json({ok:true,created:true});
+  }catch(e){
+    return res.status(409).json({error:"Ce courriel existe déjà. Essaie de te connecter."});
   }
 });
 
@@ -653,4 +703,4 @@ app.get("/api/vip-content", (req,res) => {
   });
 });
 
-app.listen(port, () => console.log(`Evan VIP: http://localhost:${port}`));
+app.listen(port, "0.0.0.0", () => console.log(`Evan VIP: http://0.0.0.0:${port}`));
