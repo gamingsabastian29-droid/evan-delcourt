@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS users (
   subscription_status TEXT DEFAULT 'inactive',
   cancel_at_period_end INTEGER DEFAULT 0,
   session_version INTEGER NOT NULL DEFAULT 1,
+  member_id INTEGER UNIQUE,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -66,6 +67,7 @@ CREATE TABLE IF NOT EXISTS comment_replies (id INTEGER PRIMARY KEY AUTOINCREMENT
 CREATE TABLE IF NOT EXISTS comment_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, comment_id INTEGER NOT NULL, user_id INTEGER NOT NULL, reason TEXT NOT NULL DEFAULT 'Autre', created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(comment_id,user_id), FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS user_settings (user_id INTEGER PRIMARY KEY, theme TEXT NOT NULL DEFAULT 'system', notifications INTEGER NOT NULL DEFAULT 1, compact_mode INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS badges (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, badge_key TEXT NOT NULL, badge_name TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,badge_key), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS reward_purchases (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, reward_key TEXT NOT NULL, reward_name TEXT NOT NULL, cost INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, name TEXT NOT NULL, description TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS project_folders (id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, name TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(project_id,name), FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, email TEXT NOT NULL, success INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
@@ -73,6 +75,7 @@ CREATE TABLE IF NOT EXISTS security_events (id INTEGER PRIMARY KEY AUTOINCREMENT
 CREATE TABLE IF NOT EXISTS visitor_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, path TEXT NOT NULL, method TEXT NOT NULL, user_id INTEGER, user_agent TEXT DEFAULT '', referer TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL);
 CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, type TEXT NOT NULL, title TEXT NOT NULL, message TEXT NOT NULL, read_at TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS user_sessions (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, user_agent TEXT DEFAULT '', ip TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, last_seen TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS oauth_accounts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, provider TEXT NOT NULL, provider_user_id TEXT, provider_name TEXT, access_token TEXT, refresh_token TEXT, expires_at INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS email_verifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, purpose TEXT NOT NULL, code_hash TEXT NOT NULL, new_password_hash TEXT, expires_at TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP, used_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 `);
 
@@ -81,6 +84,21 @@ try {
   db.prepare("ALTER TABLE free_subscribers ADD COLUMN display_name TEXT NOT NULL DEFAULT 'Fan'").run();
 } catch (e) {
   if (!String(e.message).includes("duplicate column name")) throw e;
+}
+try {
+  db.prepare("ALTER TABLE users ADD COLUMN member_id INTEGER").run();
+} catch (e) {
+  if (!String(e.message).includes("duplicate column name")) throw e;
+}
+function generateMemberId(){
+  for(let i=0;i<100;i++){
+    const n=1000+Math.floor(Math.random()*9000);
+    if(!db.prepare("SELECT id FROM users WHERE member_id=?").get(n)) return n;
+  }
+  throw new Error("Plus d’identifiants membres disponibles.");
+}
+for(const u of db.prepare("SELECT id FROM users WHERE member_id IS NULL OR member_id<1000 OR member_id>9999").all()){
+  db.prepare("UPDATE users SET member_id=? WHERE id=?").run(generateMemberId(),u.id);
 }
 try {
   db.prepare("ALTER TABLE users ADD COLUMN display_name TEXT NOT NULL DEFAULT 'Fan'").run();
@@ -220,7 +238,7 @@ app.use(express.static("public"));
 
 function currentUser(req) {
   if (!req.session?.userId) return null;
-  const user = db.prepare("SELECT id,email,display_name,subscription_status,cancel_at_period_end,created_at,session_version FROM users WHERE id=?").get(req.session.userId);
+  const user = db.prepare("SELECT id,email,display_name,member_id,subscription_status,cancel_at_period_end,created_at,session_version FROM users WHERE id=?").get(req.session.userId);
   if (!user) return null;
   if (req.session.sessionVersion && Number(req.session.sessionVersion) !== Number(user.session_version)) return null;
   if (!req.session.sessionId) return null;
@@ -266,7 +284,7 @@ app.post("/api/free-subscribe", async (req,res) => {
     const existing = db.prepare("SELECT id FROM users WHERE email=?").get(email);
     if (existing) return res.status(409).json({error:"Ce courriel existe déjà. Connecte-toi avec ton mot de passe."});
     const hash = await bcrypt.hash(password, 12);
-    const result = db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)").run(email, displayName, hash, "inactive");
+    const result = db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status,member_id) VALUES(?,?,?,?,?)").run(email, displayName, hash, "inactive", generateMemberId());
     req.session.userId = result.lastInsertRowid; createSession(req, result.lastInsertRowid);
     // Keep the legacy free-subscriber table in sync for existing ranking data.
     db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email, displayName);
@@ -284,7 +302,7 @@ app.get("/api/me", (req,res) => {
 app.get('/api/profile/me', (req,res) => {
   const user = currentUser(req);
   if (!user) return res.status(401).json({error:'Connexion requise.'});
-  const row = db.prepare('SELECT id,email,display_name,bio,profile_photo,subscription_status FROM users WHERE id=?').get(user.id);
+  const row = db.prepare('SELECT id,email,display_name,member_id,bio,profile_photo,subscription_status FROM users WHERE id=?').get(user.id);
   res.json({profile:row});
 });
 
@@ -362,8 +380,8 @@ app.post("/api/access", async (req,res) => {
     return res.status(400).json({error:"Entre ton nom ou ton pseudo pour créer ton compte."});
   try{
     const hash=await bcrypt.hash(password,12);
-    const result=db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status) VALUES(?,?,?,?)")
-      .run(email,displayName,hash,"inactive");
+    const result=db.prepare("INSERT INTO users(email,display_name,password_hash,subscription_status,member_id) VALUES(?,?,?,?,?)")
+      .run(email,displayName,hash,"inactive",generateMemberId());
     const userId=Number(result.lastInsertRowid);
     db.prepare("INSERT OR IGNORE INTO free_subscribers(email,display_name) VALUES(?,?)").run(email,displayName);
     createSession(req,userId);
@@ -502,9 +520,55 @@ app.post("/api/subscription/resume", async (req,res) => {
   } catch (e) { res.status(500).json({error:"Impossible de réactiver l'abonnement."}); }
 });
 
+
+app.get('/api/community/members',(req,res)=>{
+  const rows=db.prepare(`SELECT u.id,u.display_name,u.member_id,u.subscription_status,u.created_at,
+    CASE WHEN EXISTS(SELECT 1 FROM user_sessions s WHERE s.user_id=u.id AND s.last_seen >= datetime('now','-5 minutes')) THEN 1 ELSE 0 END AS online
+    FROM users u ORDER BY online DESC, u.display_name COLLATE NOCASE ASC LIMIT 200`).all();
+  res.json({members:rows.map(x=>({name:x.display_name||'Membre',accountId:x.member_id,status:['active','trialing'].includes(x.subscription_status)?'VIP':'FREE',online:!!x.online}))});
+});
+
+function oauthBase(){ return String(process.env.BASE_URL||`http://localhost:${process.env.PORT||3000}`).replace(/\/$/,''); }
+function oauthState(req,provider){ const state=crypto.randomBytes(24).toString('hex'); req.session['oauth_'+provider]=state; return state; }
+function validOAuthState(req,provider,state){ return !!state && state===req.session?.['oauth_'+provider]; }
+function encToken(value){
+  if(!value) return null; const key=crypto.createHash('sha256').update(String(sessionSecret)).digest(); const iv=crypto.randomBytes(12); const c=crypto.createCipheriv('aes-256-gcm',key,iv); const data=Buffer.concat([c.update(String(value),'utf8'),c.final()]); const tag=c.getAuthTag(); return [iv.toString('base64url'),tag.toString('base64url'),data.toString('base64url')].join('.');
+}
+function decToken(value){
+  try{ if(!value) return null; const [ivS,tagS,dataS]=String(value).split('.'); const key=crypto.createHash('sha256').update(String(sessionSecret)).digest(); const d=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(ivS,'base64url')); d.setAuthTag(Buffer.from(tagS,'base64url')); return Buffer.concat([d.update(Buffer.from(dataS,'base64url')),d.final()]).toString('utf8'); }catch{return null}
+}
+app.get('/api/applications',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.status(401).json({error:'Connexion requise.'});
+  const rows=db.prepare('SELECT provider,provider_name,expires_at,updated_at FROM oauth_accounts WHERE user_id=?').all(u.id);
+  const out={youtube:null,spotify:null}; for(const r of rows) out[r.provider]={connected:true,name:r.provider_name||null,expiresAt:r.expires_at||null,updatedAt:r.updated_at};
+  res.json({applications:out});
+});
+app.get('/auth/youtube',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.redirect('/vip.html#login');
+  if(!process.env.GOOGLE_CLIENT_ID)return res.status(503).send('Google/YouTube OAuth n\'est pas encore configure sur le serveur.');
+  const state=oauthState(req,'youtube'); const params=new URLSearchParams({client_id:process.env.GOOGLE_CLIENT_ID,redirect_uri:oauthBase()+'/auth/youtube/callback',response_type:'code',scope:'openid email profile https://www.googleapis.com/auth/youtube.readonly',access_type:'offline',prompt:'consent',state});
+  res.redirect('https://accounts.google.com/o/oauth2/v2/auth?'+params.toString());
+});
+app.get('/auth/youtube/callback',async(req,res)=>{
+  const u=currentUser(req); const code=String(req.query.code||''); if(!u||!validOAuthState(req,'youtube',String(req.query.state||'')))return res.status(400).send('Connexion YouTube invalide ou expiree.');
+  if(!process.env.GOOGLE_CLIENT_ID||!process.env.GOOGLE_CLIENT_SECRET)return res.status(503).send('Configuration Google OAuth incomplete.');
+  try{ const body=new URLSearchParams({code,client_id:process.env.GOOGLE_CLIENT_ID,client_secret:process.env.GOOGLE_CLIENT_SECRET,redirect_uri:oauthBase()+'/auth/youtube/callback',grant_type:'authorization_code'}); const tok=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body}); const td=await tok.json(); if(!td.access_token)throw new Error('Token Google absent'); const info=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+td.access_token}}); const id=await info.json(); db.prepare(`INSERT INTO oauth_accounts(user_id,provider,provider_user_id,provider_name,access_token,refresh_token,expires_at,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(user_id,provider) DO UPDATE SET provider_user_id=excluded.provider_user_id,provider_name=excluded.provider_name,access_token=excluded.access_token,refresh_token=COALESCE(excluded.refresh_token,oauth_accounts.refresh_token),expires_at=excluded.expires_at,updated_at=CURRENT_TIMESTAMP`).run(u.id,'youtube',id.sub||'',id.name||id.email||'Compte Google',encToken(td.access_token),encToken(td.refresh_token),Date.now()+Number(td.expires_in||3600)*1000); delete req.session.oauth_youtube; res.redirect('/vip.html#applications'); }catch(e){res.status(500).send('Impossible de connecter YouTube pour le moment.');}
+});
+app.get('/auth/spotify',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.redirect('/vip.html#login');
+  if(!process.env.SPOTIFY_CLIENT_ID)return res.status(503).send('Spotify OAuth n\'est pas encore configure sur le serveur.');
+  const state=oauthState(req,'spotify'); const params=new URLSearchParams({client_id:process.env.SPOTIFY_CLIENT_ID,response_type:'code',redirect_uri:oauthBase()+'/auth/spotify/callback',scope:'user-read-email user-read-private playlist-read-private playlist-modify-private',state}); res.redirect('https://accounts.spotify.com/authorize?'+params.toString());
+});
+app.get('/auth/spotify/callback',async(req,res)=>{
+  const u=currentUser(req); const code=String(req.query.code||''); if(!u||!validOAuthState(req,'spotify',String(req.query.state||'')))return res.status(400).send('Connexion Spotify invalide ou expiree.');
+  if(!process.env.SPOTIFY_CLIENT_ID||!process.env.SPOTIFY_CLIENT_SECRET)return res.status(503).send('Configuration Spotify OAuth incomplete.');
+  try{ const basic=Buffer.from(process.env.SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET).toString('base64'); const body=new URLSearchParams({code,redirect_uri:oauthBase()+'/auth/spotify/callback',grant_type:'authorization_code'}); const tok=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{Authorization:'Basic '+basic,'content-type':'application/x-www-form-urlencoded'},body}); const td=await tok.json(); if(!td.access_token)throw new Error('Token Spotify absent'); const info=await fetch('https://api.spotify.com/v1/me',{headers:{Authorization:'Bearer '+td.access_token}}); const id=await info.json(); db.prepare(`INSERT INTO oauth_accounts(user_id,provider,provider_user_id,provider_name,access_token,refresh_token,expires_at,updated_at) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(user_id,provider) DO UPDATE SET provider_user_id=excluded.provider_user_id,provider_name=excluded.provider_name,access_token=excluded.access_token,refresh_token=COALESCE(excluded.refresh_token,oauth_accounts.refresh_token),expires_at=excluded.expires_at,updated_at=CURRENT_TIMESTAMP`).run(u.id,'spotify',id.id||'',id.display_name||id.email||'Compte Spotify',encToken(td.access_token),encToken(td.refresh_token),Date.now()+Number(td.expires_in||3600)*1000); delete req.session.oauth_spotify; res.redirect('/vip.html#applications'); }catch(e){res.status(500).send('Impossible de connecter Spotify pour le moment.');}
+});
+app.post('/api/applications/disconnect',(req,res)=>{const u=currentUser(req);if(!u)return res.status(401).json({error:'Connexion requise.'});const provider=String(req.body.provider||'').toLowerCase();if(!['youtube','spotify'].includes(provider))return res.status(400).json({error:'Application invalide.'});db.prepare('DELETE FROM oauth_accounts WHERE user_id=? AND provider=?').run(u.id,provider);res.json({ok:true});});
+
 app.get("/api/premium-ranking", (req,res) => {
   const rows = db.prepare(`
-    SELECT display_name, email, created_at
+    SELECT display_name, email, member_id, created_at
     FROM users
     WHERE subscription_status IN ('active','trialing')
     ORDER BY created_at ASC, id ASC
@@ -514,12 +578,14 @@ app.get("/api/premium-ranking", (req,res) => {
   const ranking = rows.map((row, index) => ({
     rank: index + 1,
     name: row.display_name || row.email.split('@')[0],
+    memberId: row.member_id,
     status: 'VIP',
     joinedAt: row.created_at
   }));
   const freeRanking = freeRows.map((row, index) => ({
     rank: index + 1,
     name: row.display_name || 'Fan d’Evan',
+    memberId: null,
     status: 'FREE',
     joinedAt: row.created_at
   }));
@@ -529,11 +595,11 @@ app.get("/api/premium-ranking", (req,res) => {
 app.get("/api/profile/:name", (req,res) => {
   const name=String(req.params.name||'').trim().slice(0,40);
   if(!name) return res.status(400).json({error:"Pseudo requis."});
-  const row=db.prepare("SELECT display_name,subscription_status FROM users WHERE lower(display_name)=lower(?) LIMIT 1").get(name);
+  const row=db.prepare("SELECT display_name,member_id,subscription_status FROM users WHERE lower(display_name)=lower(?) LIMIT 1").get(name);
   if(!row) return res.status(404).json({error:"Profil introuvable."});
   const isVip=["active","trialing"].includes(row.subscription_status);
   // Seuls le pseudo et le statut FREE/VIP sont publics. Courriel, activité, paramètres, sécurité et autres données restent privés.
-  res.json({profile:{name:row.display_name,status:isVip?'VIP':'FREE'}});
+  res.json({profile:{name:row.display_name,memberId:row.member_id,status:isVip?'VIP':'FREE'}});
 });
 
 app.get("/api/dashboard", (req,res) => {
@@ -675,6 +741,13 @@ app.post("/api/projects/folder", (req,res) => {
   try { db.prepare('INSERT INTO project_folders(project_id,name) VALUES(?,?)').run(projectId,name); db.prepare('UPDATE projects SET updated_at=CURRENT_TIMESTAMP WHERE id=?').run(projectId); res.json({ok:true}); } catch(e){ res.status(409).json({error:'Ce dossier existe déjà.'}); }
 });
 
+app.get('/api/my-log', (req,res) => {
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const events=db.prepare('SELECT type,detail,created_at FROM security_events WHERE user_id=? ORDER BY id DESC LIMIT 100').all(u.id);
+  const sessions=db.prepare('SELECT id,created_at,last_seen FROM user_sessions WHERE user_id=? ORDER BY last_seen DESC LIMIT 20').all(u.id).map(x=>({id:x.id,created_at:x.created_at,last_seen:x.last_seen,current:x.id===req.session.sessionId}));
+  res.json({account:{accountId:String(u.member_id||'').padStart(4,'0'),displayName:u.display_name,email:u.email,subscription_status:u.subscription_status,created_at:u.created_at},events,sessions});
+});
+
 app.get('/api/security', (req,res) => {
   const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
   const st=securitySettings(u.id);
@@ -724,7 +797,38 @@ app.get("/api/rewards", (req,res) => {
     ['top','🏆 Top membre','Atteindre le niveau 10',level>=10]
   ];
   for(const d of defs.filter(x=>x[3])) db.prepare("INSERT OR IGNORE INTO badges(user_id,badge_key,badge_name) VALUES(?,?,?)").run(user.id,d[0],d[1]);
-  res.json({xp,level,nextLevelXp:next,stats:{activity,likes,comments,replies},badges:defs.map(d=>({key:d[0],name:d[1],description:d[2],unlocked:d[3]}))});
+  const earnedPoints=Math.floor(xp/10);
+  const spent=db.prepare("SELECT COALESCE(SUM(cost),0) s FROM reward_purchases WHERE user_id=?").get(user.id).s;
+  const points=Math.max(0,earnedPoints-spent);
+  const purchases=db.prepare("SELECT reward_key,reward_name,cost,created_at FROM reward_purchases WHERE user_id=? ORDER BY created_at DESC LIMIT 30").all(user.id);
+  res.json({xp,level,nextLevelXp:next,points,stats:{activity,likes,comments,replies},badges:defs.map(d=>({key:d[0],name:d[1],description:d[2],unlocked:d[3]})),purchases});
+});
+
+const REWARD_SHOP=[
+  {key:'profile-frame',name:'🖼️ Cadre spécial du profil',cost:50,description:'Un cadre spécial à afficher sur ton profil.'},
+  {key:'vip-bonus',name:'⭐ Bonus VIP',cost:100,description:'Récompense symbolique pour ton espace membre.'},
+  {key:'music-badge',name:'🎵 Badge Musique',cost:150,description:'Un badge spécial pour les fans de musique.'},
+  {key:'legendary',name:'👑 Récompense légendaire',cost:300,description:'Récompense rare pour les membres les plus actifs.'}
+];
+app.get('/api/reward-shop',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.status(401).json({error:'Connexion requise.'});
+  const xpBase=Math.floor((25+(db.prepare("SELECT COUNT(*) c FROM activity WHERE user_id=?").get(u.id).c*10)+(db.prepare("SELECT COUNT(*) c FROM likes WHERE user_id=?").get(u.id).c*5)+(db.prepare("SELECT COUNT(*) c FROM comments WHERE user_id=?").get(u.id).c*15)+(db.prepare("SELECT COUNT(*) c FROM comment_replies WHERE user_id=?").get(u.id).c*10)+(['active','trialing'].includes(u.subscription_status)?100:0))/10);
+  const spent=db.prepare("SELECT COALESCE(SUM(cost),0) s FROM reward_purchases WHERE user_id=?").get(u.id).s;
+  const points=Math.max(0,xpBase-spent);
+  const purchases=db.prepare("SELECT reward_key FROM reward_purchases WHERE user_id=?").all(u.id).map(x=>x.reward_key);
+  res.json({points,shop:REWARD_SHOP.map(x=>({...x,purchased:purchases.includes(x.key)}))});
+});
+app.post('/api/reward-shop/buy',(req,res)=>{
+  const u=currentUser(req); if(!u)return res.status(401).json({error:'Connexion requise.'});
+  const key=String(req.body.key||''); const item=REWARD_SHOP.find(x=>x.key===key); if(!item)return res.status(400).json({error:'Récompense introuvable.'});
+  if(db.prepare("SELECT id FROM reward_purchases WHERE user_id=? AND reward_key=?").get(u.id,key))return res.status(409).json({error:'Tu as déjà acheté cette récompense.'});
+  const activity=db.prepare("SELECT COUNT(*) c FROM activity WHERE user_id=?").get(u.id).c, likes=db.prepare("SELECT COUNT(*) c FROM likes WHERE user_id=?").get(u.id).c, comments=db.prepare("SELECT COUNT(*) c FROM comments WHERE user_id=?").get(u.id).c, replies=db.prepare("SELECT COUNT(*) c FROM comment_replies WHERE user_id=?").get(u.id).c;
+  const earned=Math.floor((25+activity*10+likes*5+comments*15+replies*10+(['active','trialing'].includes(u.subscription_status)?100:0))/10);
+  const spent=db.prepare("SELECT COALESCE(SUM(cost),0) s FROM reward_purchases WHERE user_id=?").get(u.id).s; const points=Math.max(0,earned-spent);
+  if(points<item.cost)return res.status(400).json({error:`Il te faut ${item.cost} points. Tu en as ${points}.`});
+  db.prepare("INSERT INTO reward_purchases(user_id,reward_key,reward_name,cost) VALUES(?,?,?,?)").run(u.id,item.key,item.name,item.cost);
+  notify(u.id,'reward','Récompense achetée',`${item.name} · -${item.cost} points`);
+  res.json({ok:true,points:points-item.cost,reward:item});
 });
 
 app.get("/api/announcements", (req,res) => {
