@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS badges (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id
 CREATE TABLE IF NOT EXISTS reward_purchases (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, reward_key TEXT NOT NULL, reward_name TEXT NOT NULL, cost INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, name TEXT NOT NULL, description TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS project_folders (id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, name TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP, UNIQUE(project_id,name), FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS project_notes (id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS project_files (id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, name TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'link', url TEXT NOT NULL DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, email TEXT NOT NULL, success INTEGER NOT NULL DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS security_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, type TEXT NOT NULL, detail TEXT NOT NULL DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS visitor_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT NOT NULL, path TEXT NOT NULL, method TEXT NOT NULL, user_id INTEGER, user_agent TEXT DEFAULT '', referer TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL);
@@ -487,17 +489,22 @@ app.post("/api/create-donation-session", async (req,res) => {
   if (!user) return res.status(401).json({error:"Connecte-toi d'abord."});
   if (!stripe) return res.status(503).json({error:"Stripe n’est pas configuré sur le serveur."});
   const amount = Number(req.body.amount);
-  if (!Number.isFinite(amount) || amount < 1 || amount > 10000) return res.status(400).json({error:"Choisis un montant entre 1 $ et 10 000 $."});
-  const cents = Math.round(amount * 100);
+  const currency = String(req.body.currency || "cad").toLowerCase();
+  const supportedCurrencies = new Set(["cad","usd","eur","gbp","aud","nzd","chf","jpy","krw","mxn","brl","ars","clp","cop","pen","sek","nok","dkk","pln","czk","huf","ron","bgn","try","ils","sgd","hkd","thb","myr","zar"]);
+  const zeroDecimalCurrencies = new Set(["jpy","krw"]);
+  if (!supportedCurrencies.has(currency)) return res.status(400).json({error:"Cette devise n’est pas disponible pour les dons."});
+  if (!Number.isFinite(amount) || amount < 1 || amount > 10000) return res.status(400).json({error:"Choisis un montant entre 1 et 10 000 dans la devise choisie."});
+  const unitAmount = zeroDecimalCurrencies.has(currency) ? Math.round(amount) : Math.round(amount * 100);
+  if (unitAmount < 1) return res.status(400).json({error:"Montant invalide."});
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment", customer_email: user.email,
-      line_items: [{price_data:{currency:"cad",product_data:{name:"Soutien à Evan_Delcourt"},unit_amount:cents},quantity:1}],
-      metadata:{type:"donation",user_id:String(user.id),member_id:String(user.member_id||"")},
+      line_items: [{price_data:{currency,product_data:{name:"Soutien à Evan_Delcourt"},unit_amount:unitAmount},quantity:1}],
+      metadata:{type:"donation",user_id:String(user.id),member_id:String(user.member_id||""),currency},
       success_url:`${process.env.BASE_URL}/vip.html?donation=success`, cancel_url:`${process.env.BASE_URL}/vip.html?donation=canceled`, submit_type:"donate"
     });
-    db.prepare("INSERT INTO donations(user_id,amount_cents,currency,stripe_session_id) VALUES(?,?,?,?)").run(user.id,cents,"cad",session.id);
-    logSecurity(user.id,'donation_started',`Soutien de ${amount.toFixed(2)} CAD`);
+    db.prepare("INSERT INTO donations(user_id,amount_cents,currency,stripe_session_id) VALUES(?,?,?,?)").run(user.id,unitAmount,currency,session.id);
+    logSecurity(user.id,'donation_started',`Soutien de ${amount.toFixed(zeroDecimalCurrencies.has(currency)?0:2)} ${currency.toUpperCase()}`);
     res.json({url:session.url});
   } catch(e) { res.status(500).json({error:e.message}); }
 });
@@ -831,6 +838,31 @@ app.post("/api/projects/folder", (req,res) => {
   const m=moderateText(name); if(m.blocked) return res.status(400).json({error:'Dossier bloqué : contenu interdit détecté ('+m.category+').'});
   try { db.prepare('INSERT INTO project_folders(project_id,name) VALUES(?,?)').run(projectId,name); db.prepare('UPDATE projects SET updated_at=CURRENT_TIMESTAMP WHERE id=?').run(projectId); res.json({ok:true}); } catch(e){ res.status(409).json({error:'Ce dossier existe déjà.'}); }
 });
+app.get('/api/projects/:id/details',(req,res)=>{
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const id=Number(req.params.id); const pr=db.prepare('SELECT id,name,description,created_at,updated_at FROM projects WHERE id=? AND user_id=?').get(id,u.id);
+  if(!pr) return res.status(404).json({error:'Projet introuvable.'});
+  pr.folders=db.prepare('SELECT id,name,created_at FROM project_folders WHERE project_id=? ORDER BY name').all(id);
+  pr.notes=db.prepare('SELECT id,title,body,created_at,updated_at FROM project_notes WHERE project_id=? ORDER BY updated_at DESC').all(id);
+  pr.files=db.prepare('SELECT id,name,kind,url,created_at FROM project_files WHERE project_id=? ORDER BY created_at DESC').all(id);
+  res.json({project:pr});
+});
+app.post('/api/projects/note',(req,res)=>{
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const projectId=Number(req.body.projectId), title=String(req.body.title||'').trim().slice(0,120), body=String(req.body.body||'').trim().slice(0,5000);
+  const pr=db.prepare('SELECT id FROM projects WHERE id=? AND user_id=?').get(projectId,u.id); if(!pr) return res.status(404).json({error:'Projet introuvable.'});
+  if(!title) return res.status(400).json({error:'Donne un titre à la note.'});
+  const m=moderateText(title+' '+body); if(m.blocked) return res.status(400).json({error:'Note bloquée : contenu interdit détecté ('+m.category+').'});
+  const r=db.prepare('INSERT INTO project_notes(project_id,title,body) VALUES(?,?,?)').run(projectId,title,body); db.prepare('UPDATE projects SET updated_at=CURRENT_TIMESTAMP WHERE id=?').run(projectId); res.json({ok:true,id:r.lastInsertRowid});
+});
+app.post('/api/projects/file',(req,res)=>{
+  const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
+  const projectId=Number(req.body.projectId), name=String(req.body.name||'').trim().slice(0,120), url=String(req.body.url||'').trim().slice(0,1000), kind=String(req.body.kind||'link').slice(0,30);
+  const pr=db.prepare('SELECT id FROM projects WHERE id=? AND user_id=?').get(projectId,u.id); if(!pr) return res.status(404).json({error:'Projet introuvable.'});
+  if(!name || !url) return res.status(400).json({error:'Nom et lien requis.'});
+  const r=db.prepare('INSERT INTO project_files(project_id,name,kind,url) VALUES(?,?,?,?)').run(projectId,name,kind,url); db.prepare('UPDATE projects SET updated_at=CURRENT_TIMESTAMP WHERE id=?').run(projectId); res.json({ok:true,id:r.lastInsertRowid});
+});
+
 
 app.get('/api/my-log', (req,res) => {
   const u=currentUser(req); if(!u) return res.status(401).json({error:'Connexion requise.'});
