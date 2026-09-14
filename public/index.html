@@ -56,12 +56,38 @@
     .site-gate.show{display:flex}.gate-box{width:min(560px,100%);padding:34px;border:1px solid rgba(255,93,177,.35);border-radius:30px;background:linear-gradient(145deg,rgba(17,21,43,.98),rgba(10,12,27,.98));box-shadow:0 30px 100px rgba(0,0,0,.65);text-align:center}.gate-icon{font-size:3rem;margin-bottom:10px}.gate-box h2{font-size:clamp(2rem,6vw,3.4rem);line-height:1;margin:0 0 12px}.gate-box p{color:var(--muted);margin:0 auto 24px;max-width:470px}.gate-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.gate-actions a,.gate-actions button{border:0;cursor:pointer}.gate-note{font-size:.82rem!important;margin-top:18px!important;margin-bottom:0!important}
     .account-summary{display:none;margin:14px 0 6px;padding:12px 16px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,rgba(109,114,255,.13),rgba(255,93,177,.07));align-items:center;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.15)}
     .account-summary.show{display:flex}.account-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(169,140,255,.75);background:#171a31}.account-avatar-fallback{display:flex;align-items:center;justify-content:center;font-size:24px}.account-summary-main{min-width:0;flex:1}.account-summary-name{font-weight:900;font-size:1.02rem}.account-summary-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;font-size:.82rem}.account-summary-meta span{padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}.account-online{font-weight:800}.account-online i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#20d66b;box-shadow:0 0 8px #20d66b;margin-right:5px}.account-summary-level{font-weight:800;color:#b9a7ff}.account-summary-link{text-decoration:none;white-space:nowrap}
-</style></head>
+</style>
+<style>
+.plus-menu{position:relative;display:flex;align-items:center}.plus-btn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:inherit;border-radius:999px;padding:10px 15px;font-weight:800;cursor:pointer;font:inherit}.plus-btn:hover{background:rgba(255,255,255,.09)}.plus-panel{position:absolute;right:0;top:calc(100% + 10px);min-width:230px;padding:10px;background:rgba(18,16,36,.98);border:1px solid rgba(255,92,194,.35);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.45);z-index:1000;backdrop-filter:blur(16px)}.plus-panel a,.plus-panel button{display:block;width:100%;box-sizing:border-box;text-align:left;text-decoration:none;color:inherit;background:transparent;border:0;border-radius:12px;padding:11px 12px;font:inherit;font-weight:700;cursor:pointer}.plus-panel a:hover,.plus-panel button:hover{background:rgba(255,255,255,.08)}@media(max-width:900px){.navlinks{gap:6px}.plus-panel{right:auto;left:0}.navlinks>a:nth-child(2),.navlinks>a:nth-child(3){display:none}}
+</style>
+
+<style>
+.custom-audio-bar,.custom-listen-bar{display:flex;align-items:center;gap:10px;margin:12px 0;padding:9px 11px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(5,8,25,.72);min-height:42px;box-sizing:border-box}.custom-audio-bar .audio-toggle,.custom-listen-bar .listen-youtube{border:0;border-radius:10px;padding:8px 12px;cursor:pointer;background:linear-gradient(90deg,#ff4db8,#8b5cf6);color:#fff;font-weight:700}.audio-track{position:relative;flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.15);cursor:pointer;overflow:hidden}.audio-progress{width:0;height:100%;background:linear-gradient(90deg,#ff4db8,#8b5cf6);border-radius:99px}.audio-time,.custom-listen-bar span{font-size:12px;color:#aeb5cc;white-space:nowrap}.custom-audio-bar .song-audio{display:none!important}.custom-listen-bar{justify-content:flex-start}.custom-listen-bar span{margin-left:auto}@media(max-width:650px){.custom-audio-bar,.custom-listen-bar{flex-wrap:wrap}.audio-track{order:3;flex-basis:100%}.custom-listen-bar span{margin-left:0}}
+</style>
+</head>
 <body>
   <header class="wrap">
     <nav class="nav" aria-label="Navigation principale">
       <div class="brand">EVAN<span>_DELCOURT</span></div>
-      <div class="navlinks"><a href="index.html">🏠 Accueil</a><a href="#musiques">🎵 Musiques</a><a href="#shorts">🎬 Shorts</a><a href="#musiques">🔔 Nouveautés</a><a href="abonnement.html">👑 Abonnement</a><a href="#apropos">ℹ️ À propos</a><a href="vip.html#settings">⚙️ Paramètres</a><a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a><button class="pill" type="button" id="openLogin">🔐 Se connecter</button><a class="pill" href="vip.html">👤 Créer un compte</a><button class="pill" type="button" id="themeToggle">🌙 Mode clair</button><button class="pill account-pill" type="button" id="openAccount">👤 Mon compte</button></div>
+      <div class="navlinks">
+        <a href="index.html">🏠 Accueil</a>
+        <a href="#musiques">🎵 Musiques</a>
+        <a href="#shorts">🎬 Shorts</a>
+        <div class="plus-menu">
+          <button class="plus-btn" type="button" id="plusMenuBtn" aria-expanded="false" aria-controls="plusMenuPanel">▦ Plus⌄</button>
+          <div class="plus-panel" id="plusMenuPanel" hidden>
+            <a href="#musiques">🔔 Nouveautés</a>
+            <a href="abonnement.html">👑 Abonnement</a>
+            <a href="#apropos">ℹ️ À propos</a>
+            <a href="vip.html#settings">⚙️ Paramètres</a>
+            <a href="https://www.youtube.com/@Evan_Delcourt-y7y" target="_blank" rel="noopener">▶️ YouTube</a>
+            <button type="button" id="plusLogin">🔐 Se connecter</button>
+            <a href="vip.html">👤 Créer un compte</a>
+            <button type="button" id="plusTheme">🌙 Mode clair</button>
+            <button type="button" id="plusAccount">👤 Mon compte</button>
+          </div>
+        </div>
+      </div>
     </nav>
   </header>
 
@@ -100,10 +126,10 @@
       <div class="wrap">
         <div class="section-head reveal"><div><div class="kicker">Rangée sons normaux</div><h2>Les chansons<br>complètes</h2></div><p>Les morceaux complets d’Evan sont présentés sur leur propre rangée.</p></div>
         <div class="releases">
-          <article class="card reveal new-release"><div class="cover"><img src="assets/minuit-minuit-officiel.png" alt="Pochette de Minuit, minuit officiel"></div><div class="meta"><div class="number">NOUVEAU · SORTIE 01</div><h3>MINUIT, MINUIT OFFICIEL</h3><p>Afro Soul Rap · nouveau son</p><audio class="song-audio" controls preload="metadata" src="assets/minuit-minuit-officiel.mp3"></audio><div class="content-actions"><button class="pill play-btn" type="button" data-local-audio="minuit">▶️ Écouter</button><button class="ghost like-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">💬 Commenter</button><button class="ghost fav-btn" data-title="MINUIT, MINUIT OFFICIEL">❤️ Favori</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="assets/jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button><button class="ghost fav-btn" data-title="J’SUIS QU’UN HOMME">❤️ Favori</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="assets/ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button><button class="ghost fav-btn" data-title="MA FINALE">❤️ Favori</button></div></div></article>
-          <article class="card reveal"><div class="cover"><img src="assets/repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button><button class="ghost fav-btn" data-title="REPOSE EN PAIX">❤️ Favori</button></div></div></article>
+          <article class="card reveal new-release"><div class="cover"><img src="assets/minuit-minuit-officiel.png" alt="Pochette de Minuit, minuit officiel"></div><div class="meta"><div class="number">NOUVEAU · SORTIE 01</div><h3>MINUIT, MINUIT OFFICIEL</h3><p>Afro Soul Rap · nouveau son</p><div class="custom-audio-bar" data-audio-src="assets/minuit-minuit-officiel.mp3"><button class="audio-toggle" type="button" aria-label="Lire ou mettre en pause">▶️</button><div class="audio-track"><div class="audio-progress"></div></div><span class="audio-time">0:00 / 0:00</span><audio class="song-audio" preload="metadata" src="assets/minuit-minuit-officiel.mp3"></audio></div><div class="content-actions"><button class="pill play-btn" type="button" data-local-audio="minuit">▶️ Écouter</button><button class="ghost like-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MINUIT, MINUIT OFFICIEL">💬 Commenter</button><button class="ghost fav-btn" data-title="MINUIT, MINUIT OFFICIEL">❤️ Favori</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/jsuis-quun-homme.png" alt="Pochette de J’suis qu’un homme"></div><div class="meta"><div class="number">SORTIE 01</div><h3>J’SUIS QU’UN HOMME</h3><p>Afro Soul Rap · 3 min 17 s</p><div class="custom-listen-bar"><button class="listen-youtube" type="button">▶️ Écouter</button><span>Lecture sans téléchargement</span></div><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="J’SUIS QU’UN HOMME">💬 Commenter</button><button class="ghost fav-btn" data-title="J’SUIS QU’UN HOMME">❤️ Favori</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/ma-finale.png" alt="Pochette de Ma Finale"></div><div class="meta"><div class="number">SORTIE 02</div><h3>MA FINALE</h3><p>Afro Soul Rap · 3 min 06 s</p><div class="custom-listen-bar"><button class="listen-youtube" type="button">▶️ Écouter</button><span>Lecture sans téléchargement</span></div><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="MA FINALE">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="MA FINALE">💬 Commenter</button><button class="ghost fav-btn" data-title="MA FINALE">❤️ Favori</button></div></div></article>
+          <article class="card reveal"><div class="cover"><img src="assets/repose-en-paix.png" alt="Pochette de Repose en Paix"></div><div class="meta"><div class="number">SORTIE 03</div><h3>REPOSE EN PAIX</h3><p>Afro Soul Rap</p><div class="custom-listen-bar"><button class="listen-youtube" type="button">▶️ Écouter</button><span>Lecture sans téléchargement</span></div><div class="content-actions"><button class="ghost like-btn" data-type="song" data-title="REPOSE EN PAIX">👍 J’aime</button><button class="ghost comment-btn" data-type="song" data-title="REPOSE EN PAIX">💬 Commenter</button><button class="ghost fav-btn" data-title="REPOSE EN PAIX">❤️ Favori</button></div></div></article>
         </div>
       </div>
     </section>
@@ -328,5 +354,38 @@
 
   </script>
 
+
+<script>
+(function(){
+  const btn=document.getElementById('plusMenuBtn');
+  const panel=document.getElementById('plusMenuPanel');
+  if(!btn||!panel)return;
+  function close(){panel.hidden=true;btn.setAttribute('aria-expanded','false')}
+  btn.addEventListener('click',function(e){e.stopPropagation();panel.hidden=!panel.hidden;btn.setAttribute('aria-expanded',String(!panel.hidden));});
+  document.addEventListener('click',function(e){if(!e.target.closest('.plus-menu'))close()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+  const login=document.getElementById('plusLogin'), theme=document.getElementById('plusTheme'), account=document.getElementById('plusAccount');
+  if(login) login.addEventListener('click',function(){const x=document.getElementById('openLogin'); if(x)x.click(); close();});
+  if(theme) theme.addEventListener('click',function(){const x=document.getElementById('themeToggle'); if(x)x.click();});
+  if(account) account.addEventListener('click',function(){const x=document.getElementById('openAccount'); if(x)x.click(); close();});
+})();
+</script>
+
+<script>
+(function(){
+  const yt='https://www.youtube.com/@Evan_Delcourt-y7y';
+  document.querySelectorAll('.custom-audio-bar').forEach(bar=>{
+    const audio=bar.querySelector('audio'), btn=bar.querySelector('.audio-toggle'), track=bar.querySelector('.audio-track'), prog=bar.querySelector('.audio-progress'), time=bar.querySelector('.audio-time');
+    if(!audio) return;
+    const fmt=n=>{n=Math.max(0,Math.floor(n||0));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')};
+    btn.addEventListener('click',()=>{if(audio.paused){document.querySelectorAll('.song-audio').forEach(a=>{if(a!==audio)a.pause()});audio.play();btn.textContent='⏸️'}else{audio.pause();btn.textContent='▶️'}});
+    audio.addEventListener('loadedmetadata',()=>time.textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration));
+    audio.addEventListener('timeupdate',()=>{prog.style.width=(audio.duration?(audio.currentTime/audio.duration*100):0)+'%';time.textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration)});
+    audio.addEventListener('ended',()=>{btn.textContent='▶️';prog.style.width='0%'});
+    track.addEventListener('click',e=>{if(!audio.duration)return;const r=track.getBoundingClientRect();audio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*audio.duration});
+  });
+  document.querySelectorAll('.listen-youtube').forEach(btn=>btn.addEventListener('click',()=>window.open(yt,'_blank','noopener')));
+})();
+</script>
 </body>
 </html>
