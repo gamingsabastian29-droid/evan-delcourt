@@ -28,6 +28,8 @@
     .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}.reveal.visible{opacity:1;transform:none}
     @media(max-width:850px){.nav{height:auto}.navlinks{justify-content:flex-start;overflow:visible;white-space:normal}.navlinks a,.navlinks button{display:inline-flex}.hero{grid-template-columns:1fr;padding-top:48px;gap:44px}.portrait{width:min(100%,520px);margin:auto}.releases{grid-template-columns:1fr 1fr}.shorts-band{grid-template-columns:auto 1fr}.shorts-band .pill{grid-column:1/-1;justify-self:start}.about{grid-template-columns:1fr;gap:30px}.cta{align-items:flex-start;flex-direction:column;padding:38px}.hero{grid-template-columns:1fr;padding-top:48px;gap:44px}.portrait{width:min(100%,520px);margin:auto}.releases{grid-template-columns:1fr 1fr}.shorts-band{grid-template-columns:auto 1fr}.shorts-band .pill{grid-column:1/-1;justify-self:start}.about{grid-template-columns:1fr;gap:30px}.cta{align-items:flex-start;flex-direction:column;padding:38px}}
     @media(max-width:580px){.wrap{width:min(100% - 26px,1160px)}.nav{height:auto;align-items:flex-start}.brand{width:100%}.navlinks{width:100%;gap:8px 10px}.navlinks a,.navlinks button{font-size:.82rem}.pill{padding:9px 12px;font-size:.82rem}h1{font-size:3.45rem}.hero{min-height:auto;padding-bottom:64px}.releases{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.portrait:after{right:10px;bottom:18px}.shorts-band{grid-template-columns:1fr;padding:26px}.shorts-mark{width:58px;height:74px}.shorts-band .pill{grid-column:auto}.short-list{grid-template-columns:1fr}.short-cover{aspect-ratio:4/3}.cta{margin-bottom:64px;padding:28px}.foot{flex-direction:column}}
+.top-account{position:relative;display:none;align-items:center;gap:8px}.top-account.show{display:flex}.top-account-btn{display:flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:inherit;border-radius:999px;padding:6px 10px 6px 7px;cursor:pointer;font:inherit;text-align:left}.top-account-btn:hover{background:rgba(255,255,255,.09)}.top-account-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(169,140,255,.8);background:#171a31}.top-account-fallback{display:flex;align-items:center;justify-content:center;font-size:17px}.top-account-info{display:flex;flex-direction:column;line-height:1.05}.top-account-name{font-weight:900;font-size:.84rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.top-account-id{font-size:.7rem;color:#aeb5cc;margin-top:3px}.top-account-online{width:9px;height:9px;border-radius:50%;background:#20d66b;box-shadow:0 0 8px #20d66b}.top-account-panel{position:absolute;right:0;top:calc(100% + 10px);width:250px;padding:12px;background:rgba(18,16,36,.98);border:1px solid rgba(255,92,194,.35);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.45);z-index:1100;backdrop-filter:blur(16px)}.top-account-panel[hidden]{display:none}.top-account-panel .account-row{display:flex;align-items:center;gap:10px;padding:8px}.top-account-panel .account-row b{display:block}.top-account-panel .account-row small{color:#aeb5cc}.top-account-actions{display:grid;gap:7px;margin-top:8px}.top-account-actions a{display:block;text-decoration:none;color:inherit;padding:10px 11px;border-radius:11px;background:rgba(255,255,255,.05);font-weight:800}.top-account-actions a:hover{background:rgba(255,255,255,.09)}
+@media(max-width:850px){.top-account{margin-left:auto}.top-account-info{display:none}.top-account-btn{padding:6px}.top-account-panel{right:0}.navlinks{flex:1}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.cover img,.pill,.reveal{transition:none}.reveal{opacity:1;transform:none}}
   
     .subscribe-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -64,6 +66,36 @@
 <style>
 .custom-audio-bar,.custom-listen-bar{display:flex;align-items:center;gap:10px;margin:12px 0;padding:9px 11px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(5,8,25,.72);min-height:42px;box-sizing:border-box}.custom-audio-bar .audio-toggle,.custom-listen-bar .listen-youtube{border:0;border-radius:10px;padding:8px 12px;cursor:pointer;background:linear-gradient(90deg,#ff4db8,#8b5cf6);color:#fff;font-weight:700}.audio-track{position:relative;flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.15);cursor:pointer;overflow:hidden}.audio-progress{width:0;height:100%;background:linear-gradient(90deg,#ff4db8,#8b5cf6);border-radius:99px}.audio-time,.custom-listen-bar span{font-size:12px;color:#aeb5cc;white-space:nowrap}.custom-audio-bar .song-audio{display:none!important}.custom-listen-bar{justify-content:flex-start}.custom-listen-bar span{margin-left:auto}@media(max-width:650px){.custom-audio-bar,.custom-listen-bar{flex-wrap:wrap}.audio-track{order:3;flex-basis:100%}.custom-listen-bar span{margin-left:0}}
 </style>
+
+<style>
+/* Menu premium inspiré de la maquette */
+.nav{min-height:74px!important;padding:8px 0!important;border-bottom:1px solid rgba(255,255,255,.12)!important;gap:22px!important;flex-wrap:nowrap!important}
+.brand{font-size:1.12rem!important;letter-spacing:.01em!important;white-space:nowrap!important;line-height:.9!important;text-shadow:0 0 22px rgba(151,76,255,.28)}
+.brand span{display:block;color:#fff!important;font-size:.82em;letter-spacing:.02em}
+.navlinks{justify-content:center!important;gap:5px!important;flex:1!important;overflow:visible!important;white-space:nowrap!important}
+.navlinks>a{padding:11px 14px!important;border-radius:12px!important;color:#aeb5cc!important;transition:.2s!important;font-size:.9rem!important}
+.navlinks>a:hover{color:#fff!important;background:rgba(255,255,255,.055)!important}
+.navlinks>a:first-child{color:#fff!important;background:linear-gradient(90deg,rgba(157,78,255,.18),rgba(255,73,181,.08))!important;box-shadow:inset 0 -2px 0 #9d4eff!important}
+.plus-btn{border:0!important;background:transparent!important;border-radius:12px!important;padding:11px 14px!important;color:#aeb5cc!important}
+.plus-btn:hover{color:#fff!important;background:rgba(255,255,255,.055)!important}
+.plus-panel{min-width:245px!important;padding:8px!important;background:rgba(8,11,27,.97)!important;border:1px solid rgba(157,78,255,.38)!important;border-radius:18px!important;box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 35px rgba(126,76,255,.12)!important}
+.plus-panel a,.plus-panel button{padding:11px 12px!important;border-radius:11px!important;color:#eef0ff!important}
+.plus-panel a:hover,.plus-panel button:hover{background:linear-gradient(90deg,rgba(157,78,255,.17),rgba(255,73,181,.08))!important}
+.top-account{margin-left:2px!important}
+.top-account-btn{min-width:152px!important;border:1px solid rgba(255,255,255,.13)!important;background:rgba(255,255,255,.035)!important;padding:5px 8px 5px 6px!important;box-shadow:0 8px 24px rgba(0,0,0,.16)!important}
+.top-account-btn:hover{border-color:rgba(157,78,255,.5)!important;background:rgba(255,255,255,.06)!important}
+.top-account-avatar{width:38px!important;height:38px!important;border-color:#8d63ff!important;box-shadow:0 0 14px rgba(141,99,255,.3)!important}
+.top-account-name{font-size:.84rem!important;color:#fff!important}
+.top-account-id{color:#9ea7c0!important}
+.top-account-online{width:9px!important;height:9px!important;background:#25dc71!important;box-shadow:0 0 10px rgba(37,220,113,.8)!important}
+.top-account-panel{width:285px!important;padding:12px!important;background:rgba(8,11,27,.98)!important;border:1px solid rgba(157,78,255,.4)!important;border-radius:20px!important;box-shadow:0 25px 70px rgba(0,0,0,.6)!important}
+.top-account-panel .account-row{padding:9px!important;border-bottom:1px solid rgba(255,255,255,.08)!important;margin-bottom:8px!important}
+.top-account-panel .account-row b{font-size:1rem!important;color:#fff!important}
+.top-account-actions a{background:transparent!important;padding:11px 12px!important}
+.top-account-actions a:hover{background:linear-gradient(90deg,rgba(157,78,255,.17),rgba(255,73,181,.08))!important}
+@media(max-width:900px){.nav{flex-wrap:wrap!important}.navlinks{order:3;width:100%;justify-content:flex-start!important;overflow-x:auto!important}.top-account{margin-left:auto!important}.top-account-info{display:flex!important}.top-account-btn{min-width:auto!important}.navlinks>a:nth-child(2),.navlinks>a:nth-child(3){display:inline-flex!important}}
+@media(max-width:580px){.brand{width:auto!important}.top-account-info{display:none!important}.navlinks{order:3}.nav{gap:10px!important}}
+</style>
 </head>
 <body>
   <header class="wrap">
@@ -85,6 +117,22 @@
             <a href="vip.html">👤 Créer un compte</a>
             <button type="button" id="plusTheme">🌙 Mode clair</button>
             <button type="button" id="plusAccount">👤 Mon compte</button>
+          </div>
+        </div>
+      </div>
+      <div class="top-account" id="topAccount" aria-live="polite">
+        <button class="top-account-btn" id="topAccountBtn" type="button" aria-expanded="false" aria-controls="topAccountPanel">
+          <span id="topAccountAvatarWrap"><img id="topAccountAvatar" class="top-account-avatar" alt="Photo de profil"><span id="topAccountAvatarFallback" class="top-account-avatar top-account-fallback" style="display:none">👤</span></span>
+          <span class="top-account-info"><span class="top-account-name" id="topAccountName">Compte</span><span class="top-account-id" id="topAccountId">#----</span></span>
+          <i class="top-account-online" title="En ligne"></i>
+        </button>
+        <div class="top-account-panel" id="topAccountPanel" hidden>
+          <div class="account-row"><img id="topPanelAvatar" class="top-account-avatar" alt="Photo de profil"><div><b id="topPanelName">Compte</b><small>🆔 <span id="topPanelId">#----</span> · 🟢 En ligne</small></div></div>
+          <div class="top-account-actions">
+            <a href="vip.html#profile">👤 Mon profil</a>
+            <a href="vip.html#settings">⚙️ Paramètres du compte</a>
+            <a href="vip.html#profile">🖼️ Modifier ma photo / mon nom</a>
+            <a href="vip.html#my-log">📋 Mon journal</a>
           </div>
         </div>
       </div>
@@ -337,16 +385,33 @@
       try{
         const r=await fetch(API_BASE+'/api/me',{credentials:'same-origin'}); const d=await r.json();
         const box=document.getElementById('accountSummary');
-        if(!d.loggedIn){box?.classList.remove('show');return;}
-        box?.classList.add('show');
+        const top=document.getElementById('topAccount');
+        if(!d.loggedIn){box?.classList.remove('show');top?.classList.remove('show');return;}
+        box?.classList.add('show');top?.classList.add('show');
         const u=d.user||{};
-        document.getElementById('accountSummaryName').textContent=u.display_name||'Evan_Delcourt';
-        document.getElementById('accountSummaryId').textContent='#'+String(u.member_id||'').padStart(4,'0');
+        const name=u.display_name||u.email||'Evan_Delcourt';
+        const id='#'+String(u.member_id||'').padStart(4,'0');
+        document.getElementById('accountSummaryName').textContent=name;
+        document.getElementById('accountSummaryId').textContent=id;
         document.getElementById('accountSummaryLevel').textContent=u.level||1;
         document.getElementById('accountSummaryBadges').textContent=u.badges||0;
         document.getElementById('accountSummaryXp').textContent=Number(u.xp||0).toLocaleString('fr-FR');
+        document.getElementById('topAccountName').textContent=name;
+        document.getElementById('topAccountId').textContent=id;
+        document.getElementById('topPanelName').textContent=name;
+        document.getElementById('topPanelId').textContent=id;
         const img=document.getElementById('accountAvatar'), fb=document.getElementById('accountAvatarFallback');
-        if(u.profile_photo){img.src=u.profile_photo;img.style.display='block';fb.style.display='none';}else{img.style.display='none';fb.style.display='flex';}
+        const timg=document.getElementById('topAccountAvatar'), tfb=document.getElementById('topAccountAvatarFallback');
+        const pimg=document.getElementById('topPanelAvatar');
+        if(u.profile_photo){
+          if(img){img.src=u.profile_photo;img.style.display='block';fb.style.display='none';}
+          if(timg){timg.src=u.profile_photo;timg.style.display='block';tfb.style.display='none';}
+          if(pimg)pimg.src=u.profile_photo;
+        }else{
+          if(img){img.style.display='none';fb.style.display='flex';}
+          if(timg){timg.style.display='none';tfb.style.display='flex';}
+          if(pimg)pimg.src='';
+        }
       }catch{}
     }
     loadAccountSummary();
@@ -354,6 +419,15 @@
 
   </script>
 
+
+<script>
+(function(){
+  const b=document.getElementById('topAccountBtn'), p=document.getElementById('topAccountPanel');
+  if(!b||!p)return;
+  b.addEventListener('click',()=>{const open=!p.hasAttribute('hidden');p.toggleAttribute('hidden');b.setAttribute('aria-expanded',String(!open));});
+  document.addEventListener('click',e=>{if(!b.parentElement.contains(e.target)){p.setAttribute('hidden','');b.setAttribute('aria-expanded','false');}});
+})();
+</script>
 
 <script>
 (function(){
