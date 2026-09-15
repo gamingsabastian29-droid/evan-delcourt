@@ -10,14 +10,50 @@
 </style><style id="big-settings-menu-css">
 .settings-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.settings-menu a{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:inherit;text-decoration:none;transition:.2s}.settings-menu a:hover{transform:translateY(-2px);border-color:#6d72ff}.settings-menu .ico{font-size:24px}.settings-menu b{display:block}.settings-menu span{font-size:12px;opacity:.7}.settings-sub{scroll-margin-top:90px}.back-settings{display:inline-block;margin-bottom:12px;text-decoration:none;color:inherit;font-weight:700}.back-settings:hover{text-decoration:underline}@media(max-width:700px){.settings-menu{grid-template-columns:1fr}}
 </style>
-<style>
-.site-lang-top{position:fixed;left:16px;top:14px;z-index:3000;display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(12,12,24,.88);backdrop-filter:blur(12px);box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13px}.site-lang-top span{font-size:16px}.site-lang-top select{background:transparent;color:inherit;border:0;outline:0;font:inherit;font-weight:700;cursor:pointer}.site-lang-top option{background:#16162a;color:#fff}.goog-te-banner-frame.skiptranslate{display:none!important}body{top:0!important}.goog-logo-link,.goog-te-gadget span{display:none!important}.goog-te-gadget{font-size:0!important}.goog-te-combo{display:none!important}@media(max-width:580px){.site-lang-top{left:8px;top:8px;padding:5px 7px}.site-lang-top select{max-width:105px}}
+<style id="general-account-card-style">
+.general-account-card{margin:18px 0;border:1px solid #30334d;border-radius:20px;background:linear-gradient(145deg,#12162d,#0d1021);overflow:hidden}
+.general-account-head{padding:18px 20px;border-bottom:1px solid #292d45}
+.general-account-head h2{margin:0 0 4px}
+.general-account-sub{color:#a7acc7;font-size:.92rem;margin:0}
+.general-account-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border-bottom:1px solid #292d45}
+.general-account-row:last-child{border-bottom:0}
+.general-account-left{display:flex;align-items:center;gap:12px;min-width:0}
+.general-account-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#1b2040;font-size:21px;flex:0 0 auto}
+.general-account-label{font-weight:850}
+.general-account-value{color:#a7acc7;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.general-account-edit{width:auto;min-width:92px;margin:0;padding:9px 13px;background:#1b2040;border:1px solid #3a4064;border-radius:10px;color:#fff;font-weight:800;cursor:pointer}
+.general-account-edit:hover{background:#252b50}
+.credit-mini{font-weight:950;color:#fff}
+@media(max-width:700px){.general-account-row{align-items:flex-start;flex-direction:column}.general-account-edit{width:100%}}
 </style>
-</head><body>
-<div class="site-lang-top" aria-label="Choisir la langue"><span>🌐</span><select id="siteLanguageTop" onchange="changeSiteLanguage(this.value)" aria-label="Langue du site"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></div><div id="google_translate_element" style="display:none"></div>
-<main class="wrap">
-<p><a class="back-settings" href="/">← Retour à l’accueil</a></p>
-<h1>👤 Mon espace — <span id="spaceName">evandelcourt2689</span> <span id="memberId" class="badge free" style="font-size:12px;vertical-align:middle">#----</span></h1><p class="muted">Ton compte, tes favoris, ton activité et ton abonnement au même endroit.</p><section class="card" id="supportCard" style="border:1px solid #6d72ff;background:linear-gradient(135deg,#171a36,#101329)"><h2>💰 Soutenir Evan_Delcourt</h2><p class="muted">Choisis le montant que tu veux offrir. Le paiement passe par Stripe.</p><div class="grid3"><button type="button" onclick="donate(5)">5</button><button type="button" onclick="donate(10)">10</button><button type="button" onclick="donate(20)">20</button></div><div class="grid" style="margin-top:10px"><input id="donationAmount" type="number" min="1" max="10000" step="0.01" placeholder="Montant"><select id="donationCurrency" aria-label="Devise du don"><option value="cad">🇨🇦 CAD — Dollar canadien</option><option value="usd">🇺🇸 USD — Dollar américain</option><option value="eur">🇪🇺 EUR — Euro</option><option value="gbp">🇬🇧 GBP — Livre sterling</option><option value="aud">🇦🇺 AUD — Dollar australien</option><option value="nzd">🇳🇿 NZD — Dollar néo-zélandais</option><option value="chf">🇨🇭 CHF — Franc suisse</option><option value="jpy">🇯🇵 JPY — Yen japonais</option><option value="krw">🇰🇷 KRW — Won sud-coréen</option><option value="mxn">🇲🇽 MXN — Peso mexicain</option><option value="brl">🇧🇷 BRL — Real brésilien</option><option value="ars">🇦🇷 ARS — Peso argentin</option><option value="clp">🇨🇱 CLP — Peso chilien</option><option value="cop">🇨🇴 COP — Peso colombien</option><option value="pen">🇵🇪 PEN — Sol péruvien</option><option value="sek">🇸🇪 SEK — Couronne suédoise</option><option value="nok">🇳🇴 NOK — Couronne norvégienne</option><option value="dkk">🇩🇰 DKK — Couronne danoise</option><option value="pln">🇵🇱 PLN — Zloty polonais</option><option value="czk">🇨🇿 CZK — Couronne tchèque</option><option value="huf">🇭🇺 HUF — Forint hongrois</option><option value="ron">🇷🇴 RON — Leu roumain</option><option value="bgn">🇧🇬 BGN — Lev bulgare</option><option value="try">🇹🇷 TRY — Livre turque</option><option value="ils">🇮🇱 ILS — Shekel israélien</option><option value="sgd">🇸🇬 SGD — Dollar de Singapour</option><option value="hkd">🇭🇰 HKD — Dollar de Hong Kong</option><option value="thb">🇹🇭 THB — Baht thaïlandais</option><option value="myr">🇲🇾 MYR — Ringgit malaisien</option><option value="zar">🇿🇦 ZAR — Rand sud-africain</option></select></div><button type="button" onclick="donateCustom()">💳 Faire un don</button><div id="donationResult" class="muted small"></div><p class="muted small">💡 Les fonds arrivent sur le compte Stripe du propriétaire du site et sont ensuite versés selon les réglages Stripe.</p></section>
+</head><body><main class="wrap">
+<h1>👤 Mon espace — <span id="spaceName">Evan_Delcourt</span> <span id="memberId" class="badge free" style="font-size:12px;vertical-align:middle">#----</span></h1><p class="muted">Ton compte, tes favoris, ton activité et ton abonnement au même endroit.</p>
+<section class="card general-account-card" id="general-account">
+  <div class="general-account-head">
+    <h2>⚙️ Général</h2>
+    <p class="general-account-sub">Gère les informations principales de ton compte.</p>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">👤</div><div><div class="general-account-label">Nom</div><div class="general-account-value" id="generalName">Evan_Delcourt</div></div></div>
+    <button class="general-account-edit" type="button" onclick="generalEditName()">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">📧</div><div><div class="general-account-label">Email</div><div class="general-account-value" id="generalEmail">Adresse courriel du compte</div></div></div>
+    <button class="general-account-edit" type="button" onclick="generalEditEmail()">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">🖼️</div><div><div class="general-account-label">Avatar</div><div class="general-account-value">Photo de profil</div></div></div>
+    <button class="general-account-edit" type="button" onclick="document.getElementById('profilePhoto')?.click()">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">⭐</div><div><div class="general-account-label">Plan</div><div class="general-account-value" id="generalPlan">FREE</div></div></div>
+    <button class="general-account-edit" type="button" onclick="location.hash='abonnement'">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">💳</div><div><div class="general-account-label">Solde de crédits</div><div class="general-account-value"><span class="credit-mini">CA$0.00</span> · Toutes les données sont protégées</div></div></div>
+  </div>
+</section>
+<section class="card" id="supportCard" style="border:1px solid #6d72ff;background:linear-gradient(135deg,#171a36,#101329)"><h2>💰 Soutenir Evan_Delcourt</h2><p class="muted">Choisis le montant que tu veux offrir. Le paiement passe par Stripe.</p><div class="grid3"><button type="button" onclick="donate(5)">5</button><button type="button" onclick="donate(10)">10</button><button type="button" onclick="donate(20)">20</button></div><div class="grid" style="margin-top:10px"><input id="donationAmount" type="number" min="1" max="10000" step="0.01" placeholder="Montant"><select id="donationCurrency" aria-label="Devise du don"><option value="cad">🇨🇦 CAD — Dollar canadien</option><option value="usd">🇺🇸 USD — Dollar américain</option><option value="eur">🇪🇺 EUR — Euro</option><option value="gbp">🇬🇧 GBP — Livre sterling</option><option value="aud">🇦🇺 AUD — Dollar australien</option><option value="nzd">🇳🇿 NZD — Dollar néo-zélandais</option><option value="chf">🇨🇭 CHF — Franc suisse</option><option value="jpy">🇯🇵 JPY — Yen japonais</option><option value="krw">🇰🇷 KRW — Won sud-coréen</option><option value="mxn">🇲🇽 MXN — Peso mexicain</option><option value="brl">🇧🇷 BRL — Real brésilien</option><option value="ars">🇦🇷 ARS — Peso argentin</option><option value="clp">🇨🇱 CLP — Peso chilien</option><option value="cop">🇨🇴 COP — Peso colombien</option><option value="pen">🇵🇪 PEN — Sol péruvien</option><option value="sek">🇸🇪 SEK — Couronne suédoise</option><option value="nok">🇳🇴 NOK — Couronne norvégienne</option><option value="dkk">🇩🇰 DKK — Couronne danoise</option><option value="pln">🇵🇱 PLN — Zloty polonais</option><option value="czk">🇨🇿 CZK — Couronne tchèque</option><option value="huf">🇭🇺 HUF — Forint hongrois</option><option value="ron">🇷🇴 RON — Leu roumain</option><option value="bgn">🇧🇬 BGN — Lev bulgare</option><option value="try">🇹🇷 TRY — Livre turque</option><option value="ils">🇮🇱 ILS — Shekel israélien</option><option value="sgd">🇸🇬 SGD — Dollar de Singapour</option><option value="hkd">🇭🇰 HKD — Dollar de Hong Kong</option><option value="thb">🇹🇭 THB — Baht thaïlandais</option><option value="myr">🇲🇾 MYR — Ringgit malaisien</option><option value="zar">🇿🇦 ZAR — Rand sud-africain</option></select></div><button type="button" onclick="donateCustom()">💳 Faire un don</button><div id="donationResult" class="muted small"></div><p class="muted small">💡 Les fonds arrivent sur le compte Stripe du propriétaire du site et sont ensuite versés selon les réglages Stripe.</p></section>
 <section id="auth" class="card">
   <div class="grid">
     <div>
@@ -323,20 +359,4 @@ window.addEventListener('load',loadExtraNewFeatures);
   window.addEventListener('load',()=>setTimeout(openAccountHash,250));
 })();
 </script>
-
-<script>
-function setGoogleLang(lang){
-  document.cookie='googtrans=/fr/'+lang+';path=/';
-  document.cookie='googtrans=/fr/'+lang+';path=/;domain='+location.hostname;
-  location.reload();
-}
-function changeSiteLanguage(lang){
-  localStorage.setItem('evan_site_language',lang);
-  if(lang==='fr'){document.cookie='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';location.reload();return;}
-  setGoogleLang(lang);
-}
-(function(){const l=localStorage.getItem('evan_site_language')||'fr';const el=document.getElementById('siteLanguageTop');if(el)el.value=l;})();
-function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'fr',includedLanguages:'en,es,pt,de,it',autoDisplay:false},'google_translate_element');}
-</script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body></html>

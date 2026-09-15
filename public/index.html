@@ -97,13 +97,64 @@
 @media(max-width:580px){.brand{width:auto!important}.top-account-info{display:none!important}.navlinks{order:3}.nav{gap:10px!important}}
 </style>
 
-<style>
-.site-lang-top{position:fixed;left:16px;top:14px;z-index:3000;display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(12,12,24,.88);backdrop-filter:blur(12px);box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13px}.site-lang-top span{font-size:16px}.site-lang-top select{background:transparent;color:inherit;border:0;outline:0;font:inherit;font-weight:700;cursor:pointer}.site-lang-top option{background:#16162a;color:#fff}.goog-te-banner-frame.skiptranslate{display:none!important}body{top:0!important}.goog-logo-link,.goog-te-gadget span{display:none!important}.goog-te-gadget{font-size:0!important}.goog-te-combo{display:none!important}@media(max-width:580px){.site-lang-top{left:8px;top:8px;padding:5px 7px}.site-lang-top select{max-width:105px}}
+<style id="general-account-card-style">
+.general-account-card{margin:18px 0;border:1px solid #30334d;border-radius:20px;background:linear-gradient(145deg,#12162d,#0d1021);overflow:hidden}
+.general-account-head{padding:18px 20px;border-bottom:1px solid #292d45}
+.general-account-head h2{margin:0 0 4px}
+.general-account-sub{color:#a7acc7;font-size:.92rem;margin:0}
+.general-account-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border-bottom:1px solid #292d45}
+.general-account-row:last-child{border-bottom:0}
+.general-account-left{display:flex;align-items:center;gap:12px;min-width:0}
+.general-account-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#1b2040;font-size:21px;flex:0 0 auto}
+.general-account-label{font-weight:850}
+.general-account-value{color:#a7acc7;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.general-account-edit{width:auto;min-width:92px;margin:0;padding:9px 13px;background:#1b2040;border:1px solid #3a4064;border-radius:10px;color:#fff;font-weight:800;cursor:pointer}
+.general-account-edit:hover{background:#252b50}
+.credit-mini{font-weight:950;color:#fff}
+@media(max-width:700px){.general-account-row{align-items:flex-start;flex-direction:column}.general-account-edit{width:100%}}
+</style>
+
+<style id="channel-left-menu-redesign">
+:root{--side:#090d1b;--side2:#0d1326;--glow:#7357ff}
+body{background:#050814!important}
+header.wrap{position:fixed;left:0;top:0;bottom:0;width:278px;max-width:278px;margin:0!important;padding:0!important;z-index:1000;background:linear-gradient(180deg,#080c19,#070a15);border-right:1px solid #242a43}
+header.wrap .nav{height:100%;display:flex;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;padding:22px 16px!important;gap:20px}
+header.wrap .brand{font-size:24px;font-weight:950;letter-spacing:.5px;padding:6px 12px 18px;color:#fff;text-shadow:0 0 18px rgba(115,87,255,.55)}
+header.wrap .brand span{color:#9a8cff}
+header.wrap .navlinks{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;flex:1}
+header.wrap .navlinks>a,
+header.wrap .navlinks .plus-btn{display:flex!important;align-items:center;gap:13px;width:100%!important;padding:13px 14px!important;border-radius:13px!important;text-decoration:none!important;color:#cbd1ea!important;background:transparent!important;border:1px solid transparent!important;font-weight:800!important;font-size:15px!important;text-align:left!important}
+header.wrap .navlinks>a:hover,
+header.wrap .navlinks .plus-btn:hover{background:#151b33!important;color:#fff!important;border-color:#2c3457!important}
+header.wrap .navlinks>a:nth-child(4){margin-bottom:8px}
+header.wrap .plus-menu{position:relative;width:100%}
+header.wrap .plus-panel{position:absolute;left:calc(100% + 10px);top:0;width:235px;background:#10162a;border:1px solid #303858;border-radius:16px;padding:8px;box-shadow:0 20px 50px #0008;z-index:2000}
+header.wrap .plus-panel a,header.wrap .plus-panel button{display:block;width:100%;padding:11px 12px;border:0;background:transparent;color:#e8ebfa;text-align:left;border-radius:10px;text-decoration:none;font:inherit;cursor:pointer}
+header.wrap .plus-panel a:hover,header.wrap .plus-panel button:hover{background:#1b2340}
+header.wrap .top-account{margin-top:auto;border-top:1px solid #252c45;padding-top:14px}
+header.wrap .top-account-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px;border:0;border-radius:13px;background:#0e1427;color:#fff;cursor:pointer}
+header.wrap .top-account-btn:hover{background:#151c34}
+header.wrap .top-account-panel{position:absolute;left:18px;bottom:76px;width:240px;background:#11172b;border:1px solid #303858;border-radius:16px;padding:12px;box-shadow:0 20px 50px #0008}
+body>.wrap,body>main.wrap,.wrap:not(header .wrap){max-width:none!important;width:auto!important;margin-left:278px!important;margin-right:0!important;padding-left:30px!important;padding-right:30px!important}
+body>.wrap{margin-top:0!important}
+.account-summary{margin-top:22px!important}
+.channel-top-search{display:flex;align-items:center;gap:12px;margin:22px 0 10px}
+.channel-top-search input{max-width:480px;margin:0!important;background:#10172a!important;border:1px solid #252e4b!important;border-radius:14px!important;padding:13px 16px!important;color:#fff!important}
+.channel-top-search span{font-size:13px;color:#8f96b5}
+@media(max-width:850px){
+ header.wrap{position:sticky;top:0;bottom:auto;width:100%;max-width:none;border-right:0;border-bottom:1px solid #242a43}
+ header.wrap .nav{height:auto;padding:10px!important}
+ header.wrap .brand{padding:2px 8px 8px;font-size:20px}
+ header.wrap .navlinks{display:grid!important;grid-template-columns:repeat(2,1fr);max-height:310px;overflow:auto}
+ header.wrap .navlinks>a,header.wrap .navlinks .plus-btn{font-size:13px!important;padding:10px!important}
+ header.wrap .plus-panel{position:fixed;left:12px;right:12px;top:115px;width:auto}
+ header.wrap .top-account{margin-top:6px}
+ header.wrap .top-account-panel{position:absolute;right:10px;left:auto;bottom:auto;top:65px}
+ body>.wrap,body>main.wrap,.wrap:not(header .wrap){margin-left:0!important;padding-left:12px!important;padding-right:12px!important}
+}
 </style>
 </head>
 <body>
-<div class="site-lang-top" aria-label="Choisir la langue"><span>🌐</span><select id="siteLanguageTop" onchange="changeSiteLanguage(this.value)" aria-label="Langue du site"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></div><div id="google_translate_element" style="display:none"></div>
-
   <header class="wrap">
     <nav class="nav" aria-label="Navigation principale">
       <div class="brand">EVAN<span>_DELCOURT</span></div>
@@ -144,7 +195,7 @@
         </div>
       </div>
     </nav>
-  </header>
+  </header><div class="channel-top-search wrap"><span>🔎</span><input type="search" placeholder="Rechercher sur le site…" aria-label="Rechercher sur le site"><span>🌐 Langue</span></div>
 
   <div class="wrap"><div class="account-summary" id="accountSummary" aria-live="polite"><div id="accountAvatarWrap"><img id="accountAvatar" class="account-avatar" alt="Photo de profil"><div id="accountAvatarFallback" class="account-avatar account-avatar-fallback" style="display:none">👤</div></div><div class="account-summary-main"><div class="account-summary-name" id="accountSummaryName">Evan_Delcourt</div><div class="account-summary-meta"><span>🆔 <b id="accountSummaryId">#----</b></span><span class="account-online"><i></i>En ligne</span><span class="account-summary-level">💎 Niveau <b id="accountSummaryLevel">1</b></span><span>🏅 <b id="accountSummaryBadges">0</b> badges</span><span>⭐ <b id="accountSummaryXp">0</b> XP</span></div></div><a class="pill account-summary-link" href="vip.html#profile">👤 Mon profil</a></div></div>
 
@@ -167,6 +218,32 @@
   <div class="comment-modal" id="commentModal" aria-hidden="true"><div class="login-box"><button class="login-close" id="closeComment">×</button><div class="kicker">💬 COMMENTAIRES</div><h3 id="commentTitle">Commentaires</h3><div id="commentList" class="comment-list"></div><form id="commentForm" class="subscribe-form"><textarea id="commentBody" maxlength="500" placeholder="Écris ton commentaire…" required></textarea><button class="pill" type="submit">Publier</button></form><div class="notice" id="commentNotice"></div></div></div>
 
   <main>
+<section class="card general-account-card" id="general-account">
+  <div class="general-account-head">
+    <h2>⚙️ Général</h2>
+    <p class="general-account-sub">Les informations principales du compte Evan_Delcourt.</p>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">👤</div><div><div class="general-account-label">Nom</div><div class="general-account-value">Evan_Delcourt</div></div></div>
+    <button class="general-account-edit" type="button" onclick="location.href='/vip.html#auth'">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">📧</div><div><div class="general-account-label">Email</div><div class="general-account-value">Adresse courriel du compte</div></div></div>
+    <button class="general-account-edit" type="button" onclick="location.href='/vip.html#auth'">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">🖼️</div><div><div class="general-account-label">Avatar</div><div class="general-account-value">Photo de profil</div></div></div>
+    <button class="general-account-edit" type="button" onclick="location.href='/vip.html#profile'">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">⭐</div><div><div class="general-account-label">Plan</div><div class="general-account-value">FREE / VIP</div></div></div>
+    <button class="general-account-edit" type="button" onclick="location.href='/vip.html#settings-menu'">Modifier</button>
+  </div>
+  <div class="general-account-row">
+    <div class="general-account-left"><div class="general-account-icon">💳</div><div><div class="general-account-label">Solde de crédits</div><div class="general-account-value"><span class="credit-mini">CA$0.00</span> · Toutes les données sont protégées</div></div></div>
+  </div>
+</section>
+
     <section class="hero wrap">
       <div class="reveal">
         <div class="eyebrow"><span class="dot"></span>Artiste indépendant · Canada</div>
@@ -468,21 +545,5 @@
   document.querySelectorAll('.listen-youtube').forEach(btn=>btn.addEventListener('click',()=>window.open(yt,'_blank','noopener')));
 })();
 </script>
-
-<script>
-function setGoogleLang(lang){
-  document.cookie='googtrans=/fr/'+lang+';path=/';
-  document.cookie='googtrans=/fr/'+lang+';path=/;domain='+location.hostname;
-  location.reload();
-}
-function changeSiteLanguage(lang){
-  localStorage.setItem('evan_site_language',lang);
-  if(lang==='fr'){document.cookie='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';location.reload();return;}
-  setGoogleLang(lang);
-}
-(function(){const l=localStorage.getItem('evan_site_language')||'fr';const el=document.getElementById('siteLanguageTop');if(el)el.value=l;})();
-function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'fr',includedLanguages:'en,es,pt,de,it',autoDisplay:false},'google_translate_element');}
-</script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
