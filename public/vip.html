@@ -9,8 +9,32 @@
 @media(max-width:700px){.wrap{margin:12px auto;padding:0 10px}.card{padding:15px;border-radius:16px;margin:10px 0}h1{font-size:1.5rem}button,input,select{font-size:16px}.grid{grid-template-columns:1fr!important}.benefit-grid{grid-template-columns:1fr!important}}
 </style><style id="big-settings-menu-css">
 .settings-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.settings-menu a{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:inherit;text-decoration:none;transition:.2s}.settings-menu a:hover{transform:translateY(-2px);border-color:#6d72ff}.settings-menu .ico{font-size:24px}.settings-menu b{display:block}.settings-menu span{font-size:12px;opacity:.7}.settings-sub{scroll-margin-top:90px}@media(max-width:700px){.settings-menu{grid-template-columns:1fr}}
-</style></head><body><main class="wrap">
+</style>
+<style id="general-account-css">
+.general-list{display:grid;gap:10px;margin-top:14px}.general-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid #292d45}.general-row:last-child{border-bottom:0}.general-row>div{display:flex;flex-direction:column;gap:3px}.general-btn{width:auto;min-width:96px;margin:0}.general-avatar-wrap{display:flex!important;flex-direction:row!important;align-items:center;gap:12px}.general-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff5db1,#8c63ff);font-weight:900;font-size:1.1rem;overflow:hidden;flex:none}.general-avatar img{width:100%;height:100%;object-fit:cover}@media(max-width:600px){.general-btn{min-width:84px}.general-row{padding:12px 0}}
+</style>
+
+<style>
+.credit-balance-card{margin-top:18px;padding:20px;border:1px solid var(--line,rgba(0,0,0,.1));border-radius:18px;background:var(--panel,#fff)}
+.account-card-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.kicker{font-size:.72rem;letter-spacing:.12em;font-weight:900;opacity:.7}
+.account-muted{margin:.35rem 0 0;color:var(--muted,#777)}
+.credit-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:900;background:rgba(140,99,255,.14)}
+.credit-total-label{margin-top:22px;font-size:.85rem;color:var(--muted,#777)}
+.credit-total{font-size:2rem;font-weight:950;margin:3px 0 16px}
+</style>
+
+</head><body><main class="wrap">
 <h1>👤 Mon espace — <span id="spaceName">Evan_Delcourt</span></h1><p class="muted">Ton compte, tes favoris, ton activité et ton abonnement au même endroit.</p>
+<section class="card" id="general-account">
+  <h2>⚙️ Général</h2>
+  <div class="general-list">
+    <div class="general-row"><div><b>Nom</b><span id="generalName" class="muted small">—</span></div><button class="ghost general-btn" onclick="goToProfile()">Modifier</button></div>
+    <div class="general-row"><div><b>Email</b><span id="generalEmail" class="muted small">—</span></div><button class="ghost general-btn" onclick="goToContact()">Modifier</button></div>
+    <div class="general-row"><div class="general-avatar-wrap"><div id="generalAvatar" class="general-avatar">M</div><div><b>Avatar</b><span class="muted small">Photo de profil</span></div></div><button class="ghost general-btn" onclick="goToProfile()">Modifier</button></div>
+    <div class="general-row"><div><b>Plan</b><span id="generalPlan" class="badge free">FREE</span></div><button id="generalPlanBtn" class="ghost general-btn" onclick="goToPlan()">Modifier</button></div>
+  </div>
+</section>
 <section id="auth" class="card">
   <div class="grid">
     <div>
@@ -92,7 +116,22 @@
 <section class="card settings-sub" id="about"><h2>ℹ️ 18. À propos du site</h2><p class="muted">Evan Delcourt — plateforme musicale, espace membre FREE/VIP, favoris, playlists et communauté.</p></section>
 <section class="card" id="adminVisitors" style="display:none"><h2>👑 Administration — visiteurs</h2><p class="muted">Journal privé des visites du site. Les IP et informations techniques sont visibles uniquement par le compte administrateur configuré sur le serveur.</p><div class="grid3"><div class="stat"><span>👀 Visites totales</span><b id="visitorTotal">0</b></div><div class="stat"><span>📅 Aujourd'hui</span><b id="visitorToday">0</b></div><div class="stat"><span>🌐 IP uniques aujourd'hui</span><b id="visitorUnique">0</b></div></div><button class="ghost" onclick="loadVisitors()">🔄 Actualiser</button><button class="danger" onclick="clearVisitors()">🧹 Effacer le journal</button><div id="visitorList" class="small" style="margin-top:12px"></div></section><section class="card" id="adminPanel" style="display:none"><h2>👑 Panneau Admin privé</h2><p class="muted">Réservé à ton compte administrateur. Ici tu contrôles les utilisateurs, signalements, sessions et annonces publiques.</p><div class="grid3"><div class="stat"><span>👀 Visiteurs total</span><b id="adminTotalVisitors">0</b></div><div class="stat"><span>📅 Aujourd’hui</span><b id="adminTodayVisitors">0</b></div><div class="stat"><span>👥 Comptes</span><b id="adminUsersCount">0</b></div></div><h3>👥 Utilisateurs</h3><div id="adminUsers" class="small"></div><h3>🚨 Signalements</h3><div id="adminReports" class="small"></div><h3>📢 Nouvelle annonce publique</h3><input id="annTitle" placeholder="Titre de l’annonce" maxlength="120"><textarea id="annMessage" placeholder="Message visible par tout le monde, même sans compte" maxlength="500" style="width:100%;min-height:100px;padding:12px;border-radius:12px;background:#090b18;color:white;border:1px solid #30334d"></textarea><label><input id="annVipOnly" type="checkbox"> Réserver aux VIP</label><button onclick="createAnnouncement()">📢 Publier l’annonce</button><div id="adminAnnouncementResult" class="muted small"></div><h3>📢 Annonces actuelles</h3><div id="adminAnnouncements" class="small"></div><h3>📱 Sessions actives</h3><div id="adminSessions" class="small"></div><button class="ghost" onclick="loadAdmin()">🔄 Actualiser le panneau</button></section>
 <section class="card settings-sub" id="securityPanel"><h2>🛡️ Sécurité renforcée</h2><a class="back-settings" href="#settings-menu">← Retour au menu Paramètres</a><p class="muted">Ces protections sont privées à ton compte. Tu peux les activer ou les retirer directement quand tu veux.</p><label><input id="securityEnabled" type="checkbox" checked> 🛡️ Protection générale</label><label><input id="linkProtection" type="checkbox" checked> 🔗 Bloquer les liens suspects</label><label><input id="spamProtection" type="checkbox" checked> 🚦 Anti-spam / anti-abus</label><button onclick="saveSecuritySettings()">💾 Enregistrer la sécurité</button><button class="ghost" onclick="loadSecurity()">🖥️ Voir mes sessions et événements</button><button class="danger" onclick="disableSecurity()">⚠️ Retirer les protections</button><button class="ghost" onclick="clearSecurityLog()">🧹 Effacer le journal de sécurité</button><div id="mySessions" class="small" style="margin-top:10px"></div><input id="newPassword" type="password" placeholder="Nouveau mot de passe (8 caractères minimum)"><div id="password2faArea" style="display:none;padding:12px;border:1px solid #30334d;border-radius:14px;background:#0d1021"><b>📧 Confirmation par courriel</b><p class="muted small">Un code à 6 chiffres a été envoyé pour confirmer le nouveau mot de passe.</p><input id="passwordCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code à 6 chiffres"><button class="ghost" onclick="verifyPasswordChange()">✅ Confirmer le changement</button></div><button onclick="changePassword()">Modifier mon mot de passe</button><button class="danger" onclick="logoutAll()">🚪 Déconnecter tous les appareils</button><button class="danger" onclick="logout()">🚪 Se déconnecter</button><div id="securityResult" class="muted small"></div></section>
-</div></section></main>
+</div></section>
+<section id="credit-balance" class="account-card credit-balance-card">
+  <div class="account-card-head">
+    <div>
+      <div class="kicker">CRÉDITS</div>
+      <h3>Solde de crédits</h3>
+      <p class="account-muted">Toutes les données sont protégées</p>
+    </div>
+    <div class="credit-icon">◉</div>
+  </div>
+  <div class="credit-total-label">Total (CAD) :</div>
+  <div class="credit-total">CA$0.00</div>
+  <button type="button" class="pill" onclick="alert('Ton solde de crédits est actuellement de CA$0.00.');">Voir mon solde</button>
+</section>
+
+</main>
 <script src="config.js"></script><script>
 const $=id=>document.getElementById(id);
 const API_BASE=(window.EVAN_API_URL||location.origin).replace(/\/$/,"");
@@ -100,7 +139,25 @@ async function api(url,opts={}){let r;try{r=await fetch(API_BASE+url,{headers:{'
 let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||'Une erreur est survenue.');return d}
 function esc(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function showMsg(t,ok=false){$('msg').className=ok?'ok':'error';$('msg').textContent=t}
-async function refresh(){try{let d=await api('/api/me');if(!d.loggedIn){$('auth').style.display='block';$('app').classList.add('hide');return}$('auth').style.display='none';$('app').classList.remove('hide');const accountName=d.user.display_name||d.user.email||'Evan_Delcourt';$('spaceName').textContent=accountName;$('welcome').textContent='Bienvenue, '+accountName;let isVip=['active','trialing'].includes(d.user.subscription_status);$('status').textContent='Statut : '+(isVip?'⭐ Evan VIP':'🔔 Fan d’Evan');$('badge').textContent=isVip?'⭐ VIP':'🔔 FREE';$('badge').className='badge '+(isVip?'vip':'free');$('subscribeBtn').style.display=isVip?'none':'block';$('portalBtn').style.display=isVip?'block':'none';await loadDashboard();await loadNotifications();await loadMyProfile();await loadSecurity();await loadVisitors();await loadAdmin();}catch(e){$('auth').style.display='block';showMsg(e.message)}}
+
+function goToProfile(){document.getElementById('profile')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function goToContact(){document.getElementById('contact')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function goToPlan(){document.getElementById('settings-menu')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function updateGeneralAccount(u){
+  if(!u)return;
+  const name=u.display_name||u.email||'Evan_Delcourt';
+  const email=u.email||'—';
+  const vip=['active','trialing'].includes(u.subscription_status);
+  const av=document.getElementById('generalAvatar');
+  document.getElementById('generalName').textContent=name;
+  document.getElementById('generalEmail').textContent=email;
+  const plan=document.getElementById('generalPlan');
+  plan.textContent=vip?'⭐ VIP':'FREE'; plan.className='badge '+(vip?'vip':'free');
+  document.getElementById('generalPlanBtn').textContent=vip?'Gérer':'Passer VIP';
+  if(u.profile_photo){av.innerHTML='<img src="'+esc(u.profile_photo)+'" alt="Avatar">';}else{av.textContent=(name.trim()[0]||'M').toUpperCase();}
+}
+
+async function refresh(){try{let d=await api('/api/me');if(!d.loggedIn){$('auth').style.display='block';$('app').classList.add('hide');return}$('auth').style.display='none';updateGeneralAccount(d.user);$('app').classList.remove('hide');const accountName=d.user.display_name||d.user.email||'Evan_Delcourt';$('spaceName').textContent=accountName;$('welcome').textContent='Bienvenue, '+accountName;let isVip=['active','trialing'].includes(d.user.subscription_status);$('status').textContent='Statut : '+(isVip?'⭐ Evan VIP':'🔔 Fan d’Evan');$('badge').textContent=isVip?'⭐ VIP':'🔔 FREE';$('badge').className='badge '+(isVip?'vip':'free');$('subscribeBtn').style.display=isVip?'none':'block';$('portalBtn').style.display=isVip?'block':'none';await loadDashboard();await loadNotifications();await loadMyProfile();await loadSecurity();await loadVisitors();await loadAdmin();}catch(e){$('auth').style.display='block';showMsg(e.message)}}
 async function loadNotifications(){try{let d=await api('/api/notifications');$('notifCount').textContent=d.unread||0;$('notifications').innerHTML=d.notifications.length?d.notifications.map(x=>`<div class="item" style="opacity:${x.read_at?.length?0.7:1}"><b>${esc(x.title)}</b><br><span class="muted">${esc(x.message)}</span><br><small class="muted">${esc(x.created_at)}</small>${!x.read_at?` <button class="ghost small" onclick="markOneRead(${x.id})">Lu</button>`:''}</div>`).join(''):'<p class="muted">Aucune notification pour le moment.</p>';}catch(e){}}
 async function markOneRead(id){try{await api('/api/notifications/read',{method:'POST',body:JSON.stringify({id})});await loadNotifications()}catch{}}
 async function markNotificationsRead(){try{await api('/api/notifications/read',{method:'POST',body:JSON.stringify({})});await loadNotifications()}catch{}}
